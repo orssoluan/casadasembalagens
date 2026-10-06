@@ -106,6 +106,9 @@
                     <button onclick="switchTab('d02')" id="btn-d02" class="tab-btn tab-inactive pb-4 px-1 text-sm">
                         Analise de risco
                     </button>
+                    <button onclick="switchTab('d03')" id="btn-d03" class="tab-btn tab-inactive pb-4 px-1 text-sm">
+                        Visão Operacional
+                    </button>
                 </nav>
             </div>
         </div>
@@ -389,6 +392,109 @@
                 </div>
 
             </div>
+
+            <!-- ========================================== -->
+            <!-- DASHBOARD 03: Visão Operacional            -->
+            <!-- ========================================== -->
+            <div id="dashboard-03" class="hidden space-y-6">
+                
+                <!-- Filters Section -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row flex-wrap gap-4 items-end">
+                    <div class="w-full md:w-auto flex-1 min-w-[150px]">
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Vendedor(a)</label>
+                        <select id="filter-d03-vendedor" onchange="applyFiltersD03()" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-stampare-orange focus:border-stampare-orange block p-2">
+                            <option value="Todos">Todos os Vendedores</option>
+                        </select>
+                    </div>
+                    <div class="w-full md:w-auto flex-1 min-w-[150px]">
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Mercado</label>
+                        <select id="filter-d03-mercado" onchange="applyFiltersD03()" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-stampare-orange focus:border-stampare-orange block p-2">
+                            <option value="Todos">Todos os Mercados</option>
+                        </select>
+                    </div>
+                    <div class="w-full md:w-auto flex-1 min-w-[150px]">
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Pesquisar Cliente</label>
+                        <input type="text" id="filter-d03-cliente" onkeyup="applyFiltersD03()" placeholder="Ex: TENDA ATACADO" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-stampare-orange focus:border-stampare-orange block p-2">
+                    </div>
+                    <div class="w-full md:w-auto">
+                        <button onclick="resetFiltersD03()" class="w-full md:w-auto px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition">
+                            Limpar Filtros
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPI Cards Grid -->
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 border-l-4 border-l-blue-500">
+                        <p class="text-xs font-medium text-gray-500 mb-1">Base Ativa</p>
+                        <h3 id="kpi-d03-ativa" class="text-xl font-bold text-gray-900">0</h3>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 border-l-4 border-l-green-500">
+                        <p class="text-xs font-medium text-gray-500 mb-1">Novos (Mês)</p>
+                        <h3 id="kpi-d03-novos" class="text-xl font-bold text-green-600">0</h3>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 border-l-4 border-l-orange-500">
+                        <p class="text-xs font-medium text-gray-500 mb-1">Reativados</p>
+                        <h3 id="kpi-d03-reativados" class="text-xl font-bold text-orange-600">0</h3>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 border-l-4 border-l-red-500">
+                        <p class="text-xs font-medium text-gray-500 mb-1">Perdidos (Churn)</p>
+                        <h3 id="kpi-d03-perdidos" class="text-xl font-bold text-red-600">0</h3>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 border-l-4 border-l-red-800">
+                        <p class="text-xs font-medium text-gray-500 mb-1">Taxa de Churn</p>
+                        <h3 id="kpi-d03-churn" class="text-xl font-bold text-gray-900">0%</h3>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 border-l-4 border-l-stampare-navy">
+                        <p class="text-xs font-medium text-gray-500 mb-1">Ticket Médio (3m)</p>
+                        <h3 id="kpi-d03-ticket" class="text-xl font-bold text-gray-900">R$ 0</h3>
+                    </div>
+                </div>
+
+                <!-- Charts Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 relative">
+                        <h4 class="text-sm font-bold text-gray-800 mb-4">Faturamento por Vendedor</h4>
+                        <div class="h-64 relative">
+                            <canvas id="chartD03-vendedor"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 relative">
+                        <h4 class="text-sm font-bold text-gray-800 mb-4">Distribuição do Ciclo de Vida da Carteira</h4>
+                        <div class="h-64 relative">
+                            <canvas id="chartD03-ciclo"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Table -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50 flex-wrap gap-3">
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800">Performance Detalhada da Carteira</h4>
+                            <p class="text-xs text-gray-500" id="d03-table-info">Mostrando 0 registros</p>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto table-container max-h-[400px]">
+                        <table class="min-w-full text-left text-sm whitespace-nowrap">
+                            <thead class="uppercase text-gray-500 bg-gray-50 sticky top-0 z-10 text-[11px] font-semibold border-b border-gray-200">
+                                <tr>
+                                    <th class="px-4 py-3">Cliente / ID</th>
+                                    <th class="px-4 py-3">Vendedor</th>
+                                    <th class="px-4 py-3">Mercado</th>
+                                    <th class="px-4 py-3">Ciclo de Vida</th>
+                                    <th class="px-4 py-3 text-right">Faturamento 3m</th>
+                                    <th class="px-4 py-3 text-center">Pedidos 3m</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-d03-body" class="divide-y divide-gray-100 text-gray-700">
+                                <!-- JS Populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
         </div>
     </main>
 
@@ -397,7 +503,9 @@
         const state = {
             d01: { raw: [], filtered: [], activeBubble: null },
             d02: { raw: [], filtered: [] },
+            d03: { raw: [], filtered: [] },
             markets: new Set(),
+            sellers: new Set(),
             charts: {}
         };
 
@@ -418,22 +526,21 @@
         const formatNum = (val) => new Intl.NumberFormat('pt-BR').format(val);
 
         function switchTab(tab) {
-            const btnD01 = document.getElementById('btn-d01');
-            const btnD02 = document.getElementById('btn-d02');
-            const viewD01 = document.getElementById('dashboard-01');
-            const viewD02 = document.getElementById('dashboard-02');
-
-            if (tab === 'd01') {
-                btnD01.className = 'tab-btn tab-active pb-4 px-1 text-sm';
-                btnD02.className = 'tab-btn tab-inactive pb-4 px-1 text-sm';
-                viewD01.classList.remove('hidden');
-                viewD02.classList.add('hidden');
-            } else {
-                btnD01.className = 'tab-btn tab-inactive pb-4 px-1 text-sm';
-                btnD02.className = 'tab-btn tab-active pb-4 px-1 text-sm';
-                viewD01.classList.add('hidden');
-                viewD02.classList.remove('hidden');
-            }
+            ['d01', 'd02', 'd03'].forEach(t => {
+                const num = t.replace('d', ''); // extrai apenas '01', '02', '03'
+                const btn = document.getElementById('btn-' + t);
+                const view = document.getElementById('dashboard-' + num);
+                
+                if (btn && view) {
+                    if (t === tab) {
+                        btn.className = 'tab-btn tab-active pb-4 px-1 text-sm';
+                        view.classList.remove('hidden');
+                    } else {
+                        btn.className = 'tab-btn tab-inactive pb-4 px-1 text-sm';
+                        view.classList.add('hidden');
+                    }
+                }
+            });
         }
 
         // --- DATA PROCESSING ---
@@ -454,6 +561,7 @@
             
             cleanData.forEach(row => {
                 if (row['Mercado']) state.markets.add(row['Mercado']);
+                if (row['Vendedor']) state.sellers.add(row['Vendedor']);
             });
 
             checkInitComplete();
@@ -461,10 +569,11 @@
 
         function checkInitComplete() {
             processCount++;
-            if (processCount >= 2) {
+            if (processCount >= 3) {
                 populateMarketFilters();
                 applyFiltersD01();
                 applyFiltersD02();
+                if (typeof applyFiltersD03 === 'function') applyFiltersD03();
                 // Hide overlay entirely
                 document.getElementById('setup-overlay').style.display = 'none';
             }
@@ -482,6 +591,10 @@
         function generateMockData() {
             processCount = 0;
             state.markets.clear();
+            state.sellers.clear();
+
+            // Adicionando a lista de Vendedores para a aba Operacional
+            const vendedoresList = ['Ana Sousa', 'Carlos Almeida', 'Mariana Rocha', 'Roberto Lima', 'Juliana Silva'];
 
             const mercados = [
                 'Padaria',
@@ -860,6 +973,14 @@
                 const tel = `(11) 9${Math.floor(8000 + Math.random()*1999)}-${Math.floor(1000 + Math.random()*8999)}`;
                 const email = `${comprador.split(' ')[0].toLowerCase()}@${clientName.split(' ')[0].toLowerCase().replace(/[^a-z]/g, '') || 'empresa'}.com.br`;
 
+                // --- NOVAS REGRAS PARA O DASHBOARD OPERACIONAL ---
+                const vendedor = vendedoresList[Math.floor(Math.random() * vendedoresList.length)];
+                let cicloVida = 'Ativo';
+                if (isNew) cicloVida = 'Novo';
+                else if (diasUltimo > 120) cicloVida = 'Perdido';
+                else if (ped3m > 0 && ped3mAnt === 0) cicloVida = 'Reativado';
+                // ------------------------------------------------
+
                 mockD01.push({
                     'CNPJ matriz': cnpjDemo,
                     'Cliente': clientName,
@@ -867,6 +988,8 @@
                     'Telefone': tel,
                     'Email': email,
                     'Mercado': market,
+                    'Vendedor': vendedor,
+                    'Ciclo de Vida': cicloVida,
                     'Último pedido confirmado': `2026-${Math.floor(Math.random()*12+1).toString().padStart(2,'0')}-01`,
                     'Dias desde último pedido': diasUltimo,
                     'Pedidos últimos 3m': ped3m,
@@ -900,6 +1023,8 @@
                     'Telefone': tel,
                     'Email': email,
                     'Mercado': market,
+                    'Vendedor': vendedor,
+                    'Ciclo de Vida': cicloVida,
                     'Último pedido confirmado': `2026-${Math.floor(Math.random()*12+1).toString().padStart(2,'0')}-01`,
                     'Dias sem comprar': diasUltimo,
                     'Pedidos confirmados histórico': pedHist,
@@ -910,17 +1035,22 @@
 
             processData(mockD01, 'd01');
             processData(mockD02, 'd02');
+            processData(mockD01, 'd03'); // Reusa a mesma base para o dash 03
         }
 
         function populateMarketFilters() {
             const options = Array.from(state.markets).sort().map(m => `<option value="${m}">${m}</option>`).join('');
+            const sellersOptions = Array.from(state.sellers || []).sort().map(v => `<option value="${v}">${v}</option>`).join('');
             
-            // Clear and set to avoid duplicates on re-upload
             const filterD01 = document.getElementById('filter-d01-mercado');
             const filterD02 = document.getElementById('filter-d02-mercado');
+            const filterD03Mkt = document.getElementById('filter-d03-mercado');
+            const filterD03Vend = document.getElementById('filter-d03-vendedor');
             
-            filterD01.innerHTML = '<option value="Todos">Todos os Mercados</option>' + options;
-            filterD02.innerHTML = '<option value="Todos">Todos os Mercados</option>' + options;
+            if(filterD01) filterD01.innerHTML = '<option value="Todos">Todos os Mercados</option>' + options;
+            if(filterD02) filterD02.innerHTML = '<option value="Todos">Todos os Mercados</option>' + options;
+            if(filterD03Mkt) filterD03Mkt.innerHTML = '<option value="Todos">Todos os Mercados</option>' + options;
+            if(filterD03Vend) filterD03Vend.innerHTML = '<option value="Todos">Todos os Vendedores</option>' + sellersOptions;
         }
 
         function destroyChart(id) {
@@ -1188,6 +1318,10 @@
             tbody.innerHTML = html;
         }
 
+        // ====================================================
+        // --- DASHBOARD 02 LOGIC (RISCO E ATIVIDADE) ---
+        // ====================================================
+
         function resetFiltersD02() {
             document.getElementById('filter-d02-mercado').value = 'Todos';
             document.getElementById('filter-d02-status').value = 'Todos';
@@ -1405,6 +1539,153 @@
                         <td class="px-4 py-3 text-right font-medium text-gray-900">${dias}</td>
                         <td class="px-4 py-3 text-right text-xs text-gray-600">${media > 0 ? media : 'N/A'}</td>
                         <td class="px-4 py-3 text-right text-xs font-mono bg-gray-50">${razao}</td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        // ====================================================
+        // --- DASHBOARD 03 LOGIC (VISÃO OPERACIONAL) ---
+        // ====================================================
+
+        function resetFiltersD03() {
+            document.getElementById('filter-d03-mercado').value = 'Todos';
+            document.getElementById('filter-d03-vendedor').value = 'Todos';
+            document.getElementById('filter-d03-cliente').value = '';
+            applyFiltersD03();
+        }
+
+        function applyFiltersD03() {
+            const mkt = document.getElementById('filter-d03-mercado').value;
+            const vend = document.getElementById('filter-d03-vendedor').value;
+            const search = document.getElementById('filter-d03-cliente').value.toLowerCase();
+
+            state.d03.filtered = state.d03.raw.filter(row => {
+                let pass = true;
+                if (mkt !== 'Todos' && row['Mercado'] !== mkt) pass = false;
+                if (vend !== 'Todos' && row['Vendedor'] !== vend) pass = false;
+                
+                if (search) {
+                    const clientName = (row['Cliente'] || '').toLowerCase();
+                    const clientId = (row['CNPJ matriz'] || '').toLowerCase();
+                    if (!clientName.includes(search) && !clientId.includes(search)) {
+                        pass = false;
+                    }
+                }
+                return pass;
+            });
+
+            updateDashboard03();
+        }
+
+        function updateDashboard03() {
+            const data = state.d03.filtered;
+            
+            const total = data.length;
+            const ativos = data.filter(r => r['Ciclo de Vida'] === 'Ativo' || r['Ciclo de Vida'] === 'Novo' || r['Ciclo de Vida'] === 'Reativado').length;
+            const novos = data.filter(r => r['Ciclo de Vida'] === 'Novo').length;
+            const reativados = data.filter(r => r['Ciclo de Vida'] === 'Reativado').length;
+            const perdidos = data.filter(r => r['Ciclo de Vida'] === 'Perdido').length;
+            
+            const churnRate = ativos + perdidos > 0 ? (perdidos / (ativos + perdidos)) : 0;
+            
+            const gastoTotal = data.reduce((sum, row) => sum + (row['Gasto últimos 3m (R$)'] || 0), 0);
+            const pedTotal = data.reduce((sum, row) => sum + (row['Pedidos últimos 3m'] || 0), 0);
+            const ticketMedio = pedTotal > 0 ? (gastoTotal / pedTotal) : 0;
+
+            document.getElementById('kpi-d03-ativa').innerText = formatNum(ativos);
+            document.getElementById('kpi-d03-novos').innerText = formatNum(novos);
+            document.getElementById('kpi-d03-reativados').innerText = formatNum(reativados);
+            document.getElementById('kpi-d03-perdidos').innerText = formatNum(perdidos);
+            document.getElementById('kpi-d03-churn').innerText = formatPct(churnRate);
+            document.getElementById('kpi-d03-ticket').innerText = formatMoney(ticketMedio);
+
+            renderChartD03_Vendedor(data);
+            renderChartD03_Ciclo(data);
+            renderTableD03(data);
+        }
+
+        function renderChartD03_Vendedor(data) {
+            destroyChart('chartD03-vendedor');
+            const vendSpend = {};
+            data.forEach(r => {
+                const v = r['Vendedor'] || 'Sem Vendedor';
+                vendSpend[v] = (vendSpend[v] || 0) + (r['Gasto últimos 3m (R$)'] || 0);
+            });
+            
+            const sorted = Object.entries(vendSpend).sort((a,b) => b[1]-a[1]);
+
+            const ctx = document.getElementById('chartD03-vendedor').getContext('2d');
+            state.charts['chartD03-vendedor'] = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sorted.map(i => i[0]),
+                    datasets: [{
+                        label: 'Faturamento R$',
+                        data: sorted.map(i => i[1]),
+                        backgroundColor: colors.navy,
+                        borderRadius: 4
+                    }]
+                },
+                options: { 
+                    maintainAspectRatio: false, 
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+
+        function renderChartD03_Ciclo(data) {
+            destroyChart('chartD03-ciclo');
+            const cicloCount = { 'Novo': 0, 'Ativo': 0, 'Reativado': 0, 'Perdido': 0 };
+            
+            data.forEach(r => {
+                const cv = r['Ciclo de Vida'];
+                if(cicloCount[cv] !== undefined) cicloCount[cv]++;
+            });
+
+            const ctx = document.getElementById('chartD03-ciclo').getContext('2d');
+            state.charts['chartD03-ciclo'] = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Ativos', 'Novos', 'Reativados', 'Perdidos'],
+                    datasets: [{
+                        data: [cicloCount['Ativo'], cicloCount['Novo'], cicloCount['Reativado'], cicloCount['Perdido']],
+                        backgroundColor: [colors.blue, colors.green, colors.orange, colors.red],
+                        borderWidth: 0
+                    }]
+                },
+                options: { maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'right' } } }
+            });
+        }
+
+        function renderTableD03(data) {
+            const tbody = document.getElementById('table-d03-body');
+            document.getElementById('d03-table-info').innerText = `Mostrando ${data.length} registros`;
+            
+            const sorted = [...data].sort((a,b) => (b['Gasto últimos 3m (R$)']||0) - (a['Gasto últimos 3m (R$)']||0)).slice(0, 50);
+            
+            let html = '';
+            sorted.forEach(row => {
+                const cv = row['Ciclo de Vida'];
+                const cvColor = cv === 'Novo' ? 'bg-green-100 text-green-800' : 
+                                cv === 'Reativado' ? 'bg-orange-100 text-orange-800' : 
+                                cv === 'Perdido' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800';
+
+                html += `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-4 py-3">
+                            <div class="font-medium text-gray-900">${row['Cliente'] || '-'}</div>
+                            <div class="text-[10px] text-gray-400">${row['CNPJ matriz']}</div>
+                        </td>
+                        <td class="px-4 py-3 text-xs font-medium text-stampare-navy">${row['Vendedor'] || '-'}</td>
+                        <td class="px-4 py-3 text-xs text-gray-600">${row['Mercado'] || '-'}</td>
+                        <td class="px-4 py-3 text-xs">
+                            <span class="px-2 py-1 rounded-full font-medium ${cvColor}">${cv}</span>
+                        </td>
+                        <td class="px-4 py-3 text-right font-medium text-gray-900">${formatMoney(row['Gasto últimos 3m (R$)'])}</td>
+                        <td class="px-4 py-3 text-center text-xs text-gray-600">${row['Pedidos últimos 3m'] || 0}</td>
                     </tr>
                 `;
             });
