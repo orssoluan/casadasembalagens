@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STAMPARE - Dashboard Executivo B2B</title>
+    
+    <!-- Fonts and Tailwind CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js and PapaParse -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        stampare: {
+                            navy: '#2C328E',  /* Cor Primária */
+                            orange: '#FF7B1D', /* Cor Secundária */
+                            light: '#F8FAFC', 
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #F8FAFC;
+            color: #1E293B;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .table-container::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .table-container::-webkit-scrollbar-track {
+            background: #F1F5F9; 
+            border-radius: 4px;
+        }
+        .table-container::-webkit-scrollbar-thumb {
+            background: #CBD5E1; 
+            border-radius: 4px;
+        }
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #94A3B8; 
+        }
+
+        .tab-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .tab-active {
+            border-bottom: 3px solid #FFFFFF;
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+        .tab-inactive {
+            color: #94A3B8;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-inactive:hover {
+            color: #FFFFFF;
+            border-bottom: 3px solid #64748B;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #2C328E; /* Atualizado para cor primária */
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="font-sans antialiased flex flex-col h-screen">
+
+    <header class="bg-stampare-navy shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo area -->
+                <div class="flex-shrink-0 flex items-center h-full py-2">
+                    <img src="https://i.imgur.com/oiekiyj.png" alt="STAMPARE" class="h-8 object-contain" onerror="this.src='https://placehold.co/150x40/2C328E/FFFFFF?text=STAMPARE'">
+                </div>
+                
+                <!-- Tabs -->
+                <nav class="flex space-x-8 h-full items-end" aria-label="Tabs">
+                    <button onclick="switchTab('d01')" id="btn-d01" class="tab-btn tab-active pb-4 px-1 text-sm">
+                        Analise RFM
+                    </button>
+                    <button onclick="switchTab('d02')" id="btn-d02" class="tab-btn tab-inactive pb-4 px-1 text-sm">
+                        Analise de risco
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Overlay for initial setup -->
+    <div id="setup-overlay" class="fixed inset-0 bg-stampare-light bg-opacity-95 z-50 flex flex-col items-center justify-center rounded-xl p-6 backdrop-blur-sm">
+        <div id="setup-panel" class="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full border border-gray-100 text-center">
+            <div class="bg-stampare-navy p-4 rounded-xl inline-block mb-4 shadow-inner">
+                <img src="https://i.imgur.com/oiekiyj.png" alt="STAMPARE" class="h-8 object-contain" onerror="this.src='https://placehold.co/150x40/2C328E/FFFFFF?text=STAMPARE'">
+            </div>
+            <h2 class="text-xl font-bold text-stampare-navy mb-2">Acesso ao Dashboard</h2>
+            <p class="text-sm text-gray-500 mb-6">Para visualizar as análises RFM e de Risco, inicie a aplicação com a nossa base de dados simulada.</p>
+            
+            <div class="space-y-4">
+                <button onclick="startMockData()" class="w-full py-3 bg-stampare-orange hover:bg-orange-600 text-white font-semibold rounded-lg transition mt-4 shadow-md">
+                    Gerar Dados Simulados
+                </button>
+            </div>
+        </div>
+        
+        <div id="loading-spinner" class="hidden flex-col items-center">
+            <div class="loader mb-4"></div>
+            <p class="text-stampare-navy font-medium text-lg">Processando dados...</p>
+        </div>
+    </div>
+
+    <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 relative">
+        <div class="max-w-7xl mx-auto">
+
+            <!-- ========================================== -->
+            <!-- DASHBOARD 01: RFM, Receita e Tendências    -->
+            <!-- ========================================== -->
+            <div id="dashboard-01" class="block space-y-6">
+                
+                <!-- Filters Section -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row flex-wrap gap-4 items-end">
+                    <div class="w-full md:w-auto flex-1 min-w-[150px]">
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Mercado</label>
+                        <select id="filter-d01-mercado" onchange="applyFiltersD01()" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-stampare-orange focus:border-stampare-orange block p-2">
+                            <option value="Todos">Todos os Mercados</option>
+                        </select>
+                    </div>
+                    <div class="w-full md:w-auto flex-1 min-w-[150px]">
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Pesquisar Cliente / ID</label>
+                        <input type="text" id="filter-d01-cliente" onkeyup="applyFiltersD01()" placeholder="Ex: 3M - SUMARÉ" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-stampare-orange focus:border-stampare-orange block p-2">
+                    </div>
+                    <div class="w-full md:w-auto flex-1 min-w-[150px]">
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Tendência Gasto</label>
+                        <select id="filter-d01-tendencia" onchange="applyFiltersD01()" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-stampare-orange focus:border-stampare-orange block p-2">
+                            <option value="Todos">Todas as Tendências</option>
+                            <option value="Crescendo">Crescendo</option>
+                            <option value="Estável">Estável</option>
+                            <option value="Caindo">Caindo</option>
+                            <option value="Novo no período">Novo no período</option>
+                            <option value="Sem compras">Sem compras</option>
+                        </select>
+                    </div>
+                    <div class="w-full md:w-auto">
+                        <button onclick="resetFiltersD01()" class="w-full md:w-auto px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition">
+                            Limpar Filtros
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPI Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 border-l-4 border-l-stampare-navy">
+                        <p class="text-sm font-medium text-gray-500 mb-1">Total de Clientes</p>
+                        <h3 id="kpi-d01-clientes" class="text-2xl font-bold text-gray-900">0</h3>
+                        <p class="text-xs text-gray-400 mt-2">Na seleção atual</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 border-l-4 border-l-stampare-orange">
+                        <p class="text-sm font-medium text-gray-500 mb-1">Pedidos (Últimos 3m)</p>
+                        <h3 id="kpi-d01-gasto3m" class="text-2xl font-bold text-gray-900">R$ 0</h3>
+                        <p id="kpi-d01-var-gasto" class="text-xs font-medium mt-2">vs. 3m anteriores</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 border-l-4 border-l-blue-500">
+                        <p class="text-sm font-medium text-gray-500 mb-1">Total de Pedidos (3m)</p>
+                        <h3 id="kpi-d01-pedidos" class="text-2xl font-bold text-gray-900">0</h3>
+                        <p class="text-xs text-gray-400 mt-2">Pedidos confirmados no período</p>
+                    </div>
+                </div>
+
+                <!-- Charts Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 relative">
+                        <h4 class="text-sm font-bold text-gray-800 mb-4">Tendências de Frequência e Gasto</h4>
+                        <div class="h-64 relative">
+                            <canvas id="chartD01-trends"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 relative">
+                        <h4 class="text-sm font-bold text-gray-800 mb-4">Pedidos por mercado</h4>
+                        <div class="h-64 relative">
+                            <canvas id="chartD01-mercadoGasto"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 relative col-span-1 lg:col-span-2">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h4 class="text-sm font-bold text-gray-800">Matriz RFM</h4>
+                                <p class="text-xs text-gray-500"><strong class="text-stampare-orange">Clique em uma bolha para filtrar a tela!</strong></p>
+                            </div>
+                        </div>
+                        <div class="h-[500px] relative cursor-pointer">
+                            <canvas id="chartD01-fxm"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 relative col-span-1 lg:col-span-2">
+                        <h4 class="text-sm font-bold text-gray-800 mb-4">Comparação Financeira</h4>
+                        <div class="h-64 relative">
+                            <canvas id="chartD01-compare"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Table -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50 flex-wrap gap-3">
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800">Detalhamento de Clientes</h4>
+                            <p class="text-xs text-gray-500" id="d01-table-info">Mostrando 0 registros</p>
+                            <p class="text-xs text-stampare-orange font-medium mt-1 hidden" id="d01-bubble-filter-indicator">
+                                Filtro Ativo: <span id="bubble-filter-text"></span> 
+                                <button onclick="clearBubbleFilter()" class="underline text-red-500 ml-2 hover:text-red-700">Remover Filtro</button>
+                            </p>
+                        </div>
+                        <button onclick="exportD01ToCSV()" class="px-4 py-2 bg-stampare-navy text-white text-xs font-semibold rounded-lg hover:bg-[#1E2366] transition flex items-center gap-2 shadow-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            Baixar Planilha
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto table-container max-h-[400px]">
+                        <table class="min-w-full text-left text-sm whitespace-nowrap">
+                            <thead class="uppercase text-gray-500 bg-gray-50 sticky top-0 z-10 text-[11px] font-semibold border-b border-gray-200">
+                                <tr>
+                                    <th class="px-4 py-3">Cliente / ID</th>
+                                    <th class="px-4 py-3">Contato</th>
+                                    <th class="px-4 py-3">Mercado</th>
+                                    <th class="px-4 py-3">Último Pedido</th>
+                                    <th class="px-4 py-3 text-right">Gasto 3m</th>
+                                    <th class="px-4 py-3 text-center">Tend. Gasto</th>
+                                    <th class="px-4 py-3 text-center">Ped. 3m</th>
+                                    <th class="px-4 py-3 text-center">Código R-F-M</th>
+                                    <th class="px-4 py-3 text-center">Nota RFM</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-d01-body" class="divide-y divide-gray-100 text-gray-700">
+                                <!-- JS Populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- DASHBOARD 02: Atividade e Risco            -->
+            <!-- ========================================== -->
+            <div id="dashboard-02" class="hidden space-y-6">
+                
+                <!-- Filters Section -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row flex-wrap gap-4 items-end">
+                    <div class="w-full md:w-auto flex-1 min-w-[150px]">
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Mercado</label>
+                        <select id="filter-d02-mercado" onchange="applyFiltersD02()" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-stampare-orange focus:border-stampare-orange block p-2">
+                            <option value="Todos">Todos os Mercados</option>
+                        </select>
+                    </div>
+                    <div class="w-full md:w-auto flex-1 min-w-[150px]">
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Status de Atividade</label>
+                        <select id="filter-d02-status" onchange="applyFiltersD02()" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-stampare-orange focus:border-stampare-orange block p-2">
+                            <option value="Todos">Todos os Status</option>
+                            <option value="Ativo">Ativo</option>
+                            <option value="Inativo recente">Inativo recente</option>
+                            <option value="Inativo antigo">Inativo antigo</option>
+                            <option value="Histórico insuficiente">Histórico insuficiente</option>
+                        </select>
+                    </div>
+                    <div class="w-full md:w-auto flex-1 min-w-[150px]">
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Pesquisar Cliente / ID</label>
+                        <input type="text" id="filter-d02-cliente" onkeyup="applyFiltersD02()" placeholder="Ex: 3M - SUMARÉ" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-stampare-orange focus:border-stampare-orange block p-2">
+                    </div>
+                    <div class="w-full md:w-auto">
+                        <button onclick="resetFiltersD02()" class="w-full md:w-auto px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition">
+                            Limpar Filtros
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPI Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 border-l-4 border-l-gray-800">
+                        <p class="text-xs font-medium text-gray-500 mb-1">Total Analisado</p>
+                        <h3 id="kpi-d02-total" class="text-xl font-bold text-gray-900">0</h3>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 border-l-4 border-l-green-500">
+                        <p class="text-xs font-medium text-gray-500 mb-1">Ativos</p>
+                        <h3 id="kpi-d02-ativos" class="text-xl font-bold text-green-600">0</h3>
+                        <p id="kpi-d02-ativos-pct" class="text-[10px] text-gray-400 mt-1">0% do total confiável</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 border-l-4 border-l-orange-500">
+                        <p class="text-xs font-medium text-gray-500 mb-1">Inativo Recente</p>
+                        <h3 id="kpi-d02-recentes" class="text-xl font-bold text-orange-600">0</h3>
+                        <p id="kpi-d02-recentes-pct" class="text-[10px] text-gray-400 mt-1">0% do total confiável</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 border-l-4 border-l-red-500">
+                        <p class="text-xs font-medium text-gray-500 mb-1">Inativo Antigo</p>
+                        <h3 id="kpi-d02-antigos" class="text-xl font-bold text-red-600">0</h3>
+                        <p id="kpi-d02-antigos-pct" class="text-[10px] text-gray-400 mt-1">0% do total confiável</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 border-l-4 border-l-gray-300">
+                        <p class="text-xs font-medium text-gray-500 mb-1">Histórico Insuficiente</p>
+                        <h3 id="kpi-d02-insuf" class="text-xl font-bold text-gray-500">0</h3>
+                        <p class="text-[10px] text-gray-400 mt-1">&lt; 2 pedidos confirmados</p>
+                    </div>
+                </div>
+
+                <!-- Charts Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 relative lg:col-span-1">
+                        <h4 class="text-sm font-bold text-gray-800 mb-4">Proporção de Status</h4>
+                        <div class="h-64 relative">
+                            <canvas id="chartD02-status"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 relative lg:col-span-2">
+                        <h4 class="text-sm font-bold text-gray-800 mb-4">Status de Atividade por Mercado</h4>
+                        <div class="h-64 relative">
+                            <canvas id="chartD02-mercado"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 relative col-span-1 lg:col-span-3">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h4 class="text-sm font-bold text-gray-800">Analise de troca de faixa</h4>
+                            </div>
+                        </div>
+                        <div class="h-80 relative">
+                            <canvas id="chartD02-scatter"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Table -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50 flex-wrap gap-3">
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800">Detalhamento de Clientes</h4>
+                            <p class="text-xs text-gray-500" id="d02-table-info">Mostrando 0 registros</p>
+                        </div>
+                        <button onclick="exportD02ToCSV()" class="px-4 py-2 bg-stampare-navy text-white text-xs font-semibold rounded-lg hover:bg-[#1E2366] transition flex items-center gap-2 shadow-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            Baixar Planilha
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto table-container max-h-[400px]">
+                        <table class="min-w-full text-left text-sm whitespace-nowrap">
+                            <thead class="uppercase text-gray-500 bg-gray-50 sticky top-0 z-10 text-[11px] font-semibold border-b border-gray-200">
+                                <tr>
+                                    <th class="px-4 py-3">Status</th>
+                                    <th class="px-4 py-3">Cliente / ID</th>
+                                    <th class="px-4 py-3">Contato</th>
+                                    <th class="px-4 py-3">Mercado</th>
+                                    <th class="px-4 py-3 text-center">Último Pedido</th>
+                                    <th class="px-4 py-3 text-right">Dias s/ Comprar</th>
+                                    <th class="px-4 py-3 text-right">Média Indiv. (Dias)</th>
+                                    <th class="px-4 py-3 text-right">Razão (Risco)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-d02-body" class="divide-y divide-gray-100 text-gray-700">
+                                <!-- JS Populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- GLOBAL STATE ---
+        const state = {
+            d01: { raw: [], filtered: [], activeBubble: null },
+            d02: { raw: [], filtered: [] },
+            markets: new Set(),
+            charts: {}
+        };
+
+        const colors = {
+            navy: '#2C328E',
+            orange: '#FF7B1D',
+            green: '#10B981',
+            yellow: '#FBBF24',
+            red: '#EF4444',
+            gray: '#9CA3AF',
+            slate: '#64748B',
+            blue: '#3B82F6'
+        };
+
+        // --- UTILS ---
+        const formatMoney = (val) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
+        const formatPct = (val) => new Intl.NumberFormat('pt-BR', { style: 'percent', minimumFractionDigits: 1 }).format(val);
+        const formatNum = (val) => new Intl.NumberFormat('pt-BR').format(val);
+
+        function switchTab(tab) {
+            const btnD01 = document.getElementById('btn-d01');
+            const btnD02 = document.getElementById('btn-d02');
+            const viewD01 = document.getElementById('dashboard-01');
+            const viewD02 = document.getElementById('dashboard-02');
+
+            if (tab === 'd01') {
+                btnD01.className = 'tab-btn tab-active pb-4 px-1 text-sm';
+                btnD02.className = 'tab-btn tab-inactive pb-4 px-1 text-sm';
+                viewD01.classList.remove('hidden');
+                viewD02.classList.add('hidden');
+            } else {
+                btnD01.className = 'tab-btn tab-inactive pb-4 px-1 text-sm';
+                btnD02.className = 'tab-btn tab-active pb-4 px-1 text-sm';
+                viewD01.classList.add('hidden');
+                viewD02.classList.remove('hidden');
+            }
+        }
+
+        // --- DATA PROCESSING ---
+        let processCount = 0;
+
+        function processData(data, type) {
+            // Clean up potentially problematic keys
+            const cleanData = data.map(row => {
+                let cleanRow = {};
+                for (let key in row) {
+                    cleanRow[key.trim()] = row[key];
+                }
+                return cleanRow;
+            });
+            
+            state[type].raw = cleanData;
+            state[type].filtered = cleanData;
+            
+            cleanData.forEach(row => {
+                if (row['Mercado']) state.markets.add(row['Mercado']);
+            });
+
+            checkInitComplete();
+        }
+
+        function checkInitComplete() {
+            processCount++;
+            if (processCount >= 2) {
+                populateMarketFilters();
+                applyFiltersD01();
+                applyFiltersD02();
+                // Hide overlay entirely
+                document.getElementById('setup-overlay').style.display = 'none';
+            }
+        }
+
+        function startMockData() {
+            document.getElementById('setup-panel').classList.add('hidden');
+            document.getElementById('loading-spinner').classList.remove('hidden');
+            document.getElementById('loading-spinner').classList.add('flex');
+            
+            // Short delay to allow UI to update before heavy processing
+            setTimeout(generateMockData, 300);
+        }
+
+        function generateMockData() {
+            processCount = 0;
+            state.markets.clear();
+
+            const mercados = [
+                'Padaria',
+                'Restaurante',
+                'Lanchonete',
+                'Pizzaria',
+                'Clube Esportivo',
+                'Hotel',
+                'Motel',
+                'Indústria',
+                'Clínica',
+                'Escola',
+                'Condomínio',
+                'Loja'
+            ];
+            
+            const realNames = [
+                'THREE LIFE LAB INDUSTRIA DE ALIMENTOS, COSMETICOS E SERVICOS',
+                'ASSOCIACAO ATLETICA BOTUCATUENSE',
+                'BAR RUBIAO JUNIOR LTDA',
+                'QUALYNUTRI NUTRACEUTICOS LTDA',
+                'PISTRINUM PANIFICACAO E CONFEITARIA LTDA',
+                'SANTA CECILIA CONVENIENCIA LTDA',
+                'LIVIA MARIA OKADA',
+                'UNIMED DE BOTUCATU COOPERATIVA DE TRABALHO MEDICO',
+                'PATRICK WESLEY ABDALA DA SILVA',
+                'RESTAURANTE LETS EAT BOTUCATU LTDA',
+                'ASSOCIACAO ATLETICA FERROVIARIA DE BOTUCATU',
+                'NILSA APARECIDA DE MACEDO',
+                'FERNANDO DE MACEDO FERREIRA',
+                'TENDA ATACADO SA',
+                'SUPERMERCADO SAO JOSE S.M. LTDA',
+                'THIAGO IGE MARQUESIM',
+                'BRUNA CAVALCANTE DE CASTRO MINIMERCADO',
+                'CELSO AMAURI MACHADO DA SILVA JUNIOR',
+                'ANDRE APARECIDO BRASILIO LANCHONETE EIRELI',
+                'LUCAS NICOLETTI DE BARCELLOS LTDA',
+                'AMANDA CRISTINA DE LIMA',
+                'CINAIA BATISTA PIPPO GERMANO',
+                'ARNALDO RIBEIRO DE BRITO',
+                'ANDRESSA DIAS DA SILVA 43885806860',
+                'ANDREZA MARIA DE ARRUDA',
+                'RIELLIS CENTER HOTEL LTDA',
+                'JAAZIEL ANDRE DE SANTANA MARTINS LTDA',
+                'MEGA WHIP INDUSTRIA E COMERCIO DE CHICOTES ELETRICOS LTDA.',
+                'THAINA AMBROSIO CALMAN',
+                'JOSUE FRANCISCO DA SILVA',
+                'ACUCENA BEATRIZ CORTEZ RAMOS',
+                'BEM BAUM PRODUTOS ALIMENTICIOS LTDA',
+                'BEM BAUM PRODUTOS ALIMENTICIOS LTDA',
+                'ISABEL CRISTINA BRUNO',
+                'MARTINS ARAUJO E DA SILVA SUPERMERCADO LTDA',
+                'NATALIA APARECIDA VIANA DE BARROS',
+                'CASA PIA SAO VICENTE DE PAULO',
+                'SAMANTHA MICHELLE FRANCISCO FELICIANO',
+                'PAULO CESAR MATHIAS DE SOUZA 41781206899',
+                'LUCAS KAUAN DE SOUZA MELLO',
+                'ARQUIDIOCESE DE SANTANA DE BOTUCATU',
+                'ELENICE CARDOSO MACHADO GOMES 13080963806',
+                'MIRA & MIRA ALTAS HORAS LTDA',
+                'CENTRO ESPIRITA CAMINHO DA LUZ',
+                'ARETE EVENTOS E PROMOCOES LTDA',
+                'COMERCIAL RIAZZO COMERCIO VAREJISTA E ATACADISTA DE ALIMENTO',
+                'LUDISSELMA LIMA VIEIRA 31603695877',
+                'MICHELE FERREIRA DA CUNHA',
+                'ANA CAROLINA PONIK DE CAMPOS PACHECO 33578596884',
+                'LIDIA DE OLIVEIRA SILVA - RESTAURANTE',
+                'UNIMED DE BOTUCATU COOPERATIVA DE TRABALHO MEDICO',
+                'HS OLIVEIRA LANCHONETE',
+                'ESCATULA VERGA E VERGA LTDA.',
+                'REAL CORREIA LTDA',
+                'MARINA BENTO DE ALMEIDA 07202905892',
+                'MARIA CONCEICAO DOS REIS',
+                'MARIA APARECIDA RODRIGUES MANGEGALI 09628006860',
+                'TENDA ATACADO SA',
+                'PAOLA EDUARDA DE MORAES 45547649821',
+                'FERNANDA MESSIAS',
+                'BP FOODS BTU LTDA',
+                'ANA CRISTINA KEMPKENS UCHOA GALANTE',
+                'MARTINES FERNANDES RODRIGUES DE BARROS',
+                'BEDISVA BENEFICIAMENTO E DISTRIBUICAO DE VIDROS E ACESSORIOS',
+                'FERNANDO DE MACEDO FERREIRA',
+                'DANIELA DE OLIVEIRA SILVA 40.939.913',
+                'STAR GARDEN COMERCIO DE MOVEIS E DECORACAO LTDA',
+                'CUESTA RR INDUSTRIA DE ALIMENTOS LTDA',
+                'MERCADO EXPRESS MONTE MOR LTDA',
+                'SERGIO FERNANDO LOURENCAO LTDA',
+                'MARIA CELIA SILVA DOS SANTOS SOUSA',
+                'EMPORIO TORRA PRECO LTDA',
+                'NUNES DA COSTA E LOPES RESTAURANTE LTDA',
+                'MARIA CICILIA JUSTO DE LIMA',
+                'LUV INDUSTRIA E COMERCIO DE ALIMENTOS PET LTDA',
+                'TAMIRES BUENO MENDES PIZZARIA ITALIANA',
+                'IVONE APARECIDA MOTOLO',
+                'SERGIO ROBERTO FLORIANO',
+                'EMILIO LUIZ CELESTINO ADEGA',
+                'ANA CLAUDIA COSTA SAUER',
+                'CAVALHEIRO & CIA EQUIPAMENTOS DE SEGURANCA LTDA',
+                'LUIZ GUSTAVO DA SILVA COMERCIO DE ALIMENTOS BOTUCATU EIRELI',
+                'KARLA APARECIDA DE OLIVEIRA TOFFOLI',
+                'BLACK ANGUS BOUTIQUE DE CARNES E ARTIGOS DE CHURRASCO LTDA',
+                'ESFIRRARIA ARTESANAL SAO MANUEL LTDA',
+                'PEDRO HENRIQUE DE ABREU 44621401840',
+                'JULIO C. DA SILVA JUNIOR LTDA',
+                'CLEBER GABRIEL DA SILVA BRAZ',
+                'ALEXSANDRI DA SILVA LAZARI',
+                'EXCELLENCE PLAZA HOTEL LTDA',
+                'MILTON CESAR DOS SANTOS',
+                'CLAUDIA FERNANDA DE MORAES',
+                'JOSE AMILSON GOMES DE LIMA',
+                'JESSICA CATARINA ROSA',
+                'COMERCIAL MORETO PINCELI LTDA',
+                'EDIVALDO CERANTO BOTUCATU',
+                'ERIK VIEIRA PALADINO 42232564835',
+                'MENDES & FRAGA LTDA',
+                'JOSE RENATO BARRETO PEREIRA 28614787804',
+                'ALVARO TADEU PEREIRA DE FREITAS 46303756867',
+                'JOSE LUIZ MARQUESINI MARTINS',
+                'JULIO CESAR DA SILVA JUNIOR & CIA LTDA',
+                'MANUELA CAROLINA RAMOS',
+                'INSTITUICAO TOLEDO DE ENSINO',
+                'T A DE ALMEIDA SUPERMERCADO',
+                'LIVIA MARIA PEDRO',
+                'NEY DE PADUA PAINCO FILHO 42336630818',
+                'ECCO LIBERTY SOLUCOES AMBIENTAIS LTDA',
+                'AUTO POSTO LUCHES LTDA',
+                'MARCELO FRANCISCO DA SILVA 35326419840',
+                'SEIJIN SUSHI BAR E RESTAURANTE LTDA',
+                'ROSINEIDE DA SILVA SOUZA 29287477884',
+                'DEPOSITO DE BEBIDAS XV LTDA',
+                'JESSICA FERNANDA MACHADO DIAS 40181980860',
+                'LUIS FERNANDO SODRE & CIA LTDA',
+                'MARIA CAROLINA MANGINI PRADO',
+                'LUCHES E MORAES COMERCIO DE COMBUSTIVEIS BOTUCATU LTDA',
+                'MOTEL CACULA LTDA',
+                'NATALIA DOS ANJOS LOBO 13240822830',
+                'MARLENE DE FATIMA JANA BENJAMIM',
+                'FLORESCER JARDIM DE INFANCIA WALDORF LTDA',
+                'BRAZILIAN BIOTECH BEEF LTDA',
+                'FANTA INCORPORACOES IMOBILIARIAS SPE LTDA',
+                'LUMINOVE INDUSTRIA E COMERCIO DE COSMETICOS LTDA',
+                'MUNICIPIO DE PARDINHO',
+                'BELLO & CAVAZZANA MERCEARIA LTDA',
+                'VITORIO FERNANDO BARTOLI',
+                'EDSON DA SILVA TOLEDO JUNIOR',
+                'RENATO CAPAIS JUNIOR & CIA LTDA',
+                'ARTHUR DOS SANTOS 46218957888',
+                'KV EMBALAGENS E PRODUTOS DE LIMPEZA LTDA',
+                'VIVIANE DA SILVEIRA MELO',
+                'ROBSON ANTONIO PALMEIRA DE SOUZA',
+                'ANDERSON HENRIQUE GOMES',
+                'SANTA CASA DE MISERICORDIA DE ASSIS',
+                'EDER JUNIO CAETANO SANTOS 07217362628',
+                'PANIFICADORA FLOR DO LUAR LTDA',
+                'JOSE CARLOS ZANELA',
+                'CONDOMINIO RESIDENCIAL VIVENDAS DE LA SALLE',
+                'RESTAURANTE CHACARA FLORESTA LTDA',
+                'MATEUS NEVES DE CARVALHO ALIMENTICIOS',
+                'MARCIO PAGANINI GOMES DA CUNHA',
+                'SEU CALDINHO COMIDA CASEIRA LTDA',
+                'MJBC BRINQUEDOS E NEGOCIOS LTDA',
+                'GRASIELE DA SILVA BARBOSA',
+                'MARINA DOS REIS MACHADO 17052117800',
+                'FURLANETO & OLIVEIRA RESTAURANTE LTDA',
+                'ASSOCIACAO BENEFICENTE DE PIRANGI',
+                'GLEYCIELI DE SOUZA PARRA',
+                'LAZULI MOTEL LTDA',
+                'LUIZ HENRIQUE CORDEIRO FILHO',
+                'EDINO APARECIDO CAMARGO',
+                'DAIANE KERLEY ALVES DE SOUZA 32374576809',
+                'LUIZ CAMILOTTI GOMES',
+                'ALENCAR DISTRIBUIDORA DE OVOS LTDA',
+                'ROSANGELA MARIA SILVERIO MAZZON',
+                'SORVETERIA GELA TOM LTDA',
+                'JAQUELINE PASSIONI 37403731808',
+                'MIZAEL GONCALVES',
+                'DANILO OLIVEIRA SILVA',
+                'PANIFICADORA DO TECO LTDA',
+                'ESCATULA SUCOS E ALIMENTOS LTDA',
+                'ALINE APARECIDA NUNES DE LIMA',
+                'HAMILTON REGIS POLICASTRO',
+                'CAMILE NUNES BUENO ABRAMO',
+                'JOSE GUILHERME VICENSOTTO',
+                'RICARDO CRISTIAN GIMENEZ 30864947860',
+                'GILMARA FERREIRA VIEIRA',
+                'KARLA BRITO GERMANO',
+                'SCARLLET ZAMUNER NIBI',
+                'VITOR RUIZ FERRAZ PENEDO',
+                'MARILENA DE MOURA & CIA LTDA',
+                'BEATRIS CLAUDINEIA CARDOSO',
+                'TORRES & TORRES MATERIAIS PARA CONSTRUCAO E ACABAMENTOS LTDA',
+                'POUSADA MANDALA LTDA',
+                'IVAN LUIS COSTA & COSTA LTDA',
+                'MARCIA PAULA DO CARMO',
+                'THIAGO GABRIEL DE SOUZA 49.078.373',
+                'BOLLA PADARIA E CONFEITARIA LTDA',
+                'K R GAMA COMERCIO DE MATERIAIS DE CONSTRUCAO',
+                'MUNICIPIO DE PARDINHO',
+                'CENTRO ODONTOLOGICO VAMOS SORRIR BOTUCATU LTDA',
+                'CARAMURU CONSTRUCOES LTDA',
+                'MARIA RITA DE CAMARGO',
+                'VIVIANI MACHADO',
+                'ADRIANO GRIMALDI',
+                'LEIA APARECIDA ROCHA CARAMELO',
+                'COMERCIAL AGUIAR BOTUCATU LTDA',
+                'LUCIANO ANTUNES CHURRASCO',
+                'VILLA PINK COMERCIO DE ARTIGOS DO VESTUARIO E ACESSORIOS LTD',
+                'MARINALVA APARECIDA DE MOURA',
+                'PAULO HENRIQUE CAETANO DE VICENTES',
+                'SAMELA RAQUEL BARBETTA BEBIANO 38665358803',
+                'A.DE PAULA BLASIO LTDA',
+                'HELIA MARIA OVIGLI GERMANO',
+                'CARLOS ALBERTO DA SILVA NUNES',
+                'SIDNEI JOSE CAMARGO',
+                'VALDECI  GALVAO DA SILVA',
+                'MARIA CRISTIANE DA SILVA RIBEIRO',
+                'SIMAO DEPOSITO DE BEBIDAS LTDA',
+                'TELMA DOS SANTOS COSTA',
+                'MARVIO ANTONIO SILVEIRA LEITE',
+                'ANDRE LUIZ DA ROSA',
+                'TAMIRES MARIANA FRACAROLI',
+                'JOSELITO PAULO RONSINI',
+                'TAIS DE OLIVEIRA BARBAQUE 42771702851',
+                'RAB COMERCIO DE BEBIDAS LTDA',
+                'WANDERLEY DE MATOS',
+                'RODRIGO PAGNINI DA CRUZ 27422339896',
+                'ROSELI APARECIDA FIDENCIO 26499016837',
+                'LUZIA DE FATIMA ROSA PAES 30412103800',
+                'HM TOWER ENGENHARIA E CONSTRUCOES LTDA',
+                'LAMEU E GARAVELLO MINIMERCADO LTDA',
+                'JENIFFER DE OLIVEIRA MARTINS',
+                'IRAILDE MARIA DOS SANTOS 14418709894',
+                'CATIA BENEDITO',
+                'CALMAN & RODRIGUES LTDA',
+                'PRODIVE COMERCIO DE VEICULOS BOTUCATU LTDA.',
+                'AGROVIDA PECUARIA PRODUTOS ARTESANAIS BIODINAMICOS LTDA',
+                'REINALDO GOMES DOS SANTOS 48417955968',
+                'ROSANGELA EVANGELHO PAIVA',
+                'PUNHO DE ACO COMERCIO E MONTAGEM DE FERROS LTDA',
+                'IGOR PIMENTEL NUNES',
+                'HS OLIVEIRA MERCADOS E HORTIFRUTIGRANJEIROS LTDA',
+                'LBG COMERCIO E REPRESENTACOES LTDA',
+                'ALEMAO ESPETINHOS',
+                'MARA CINTIA BENEDITO MARTOS',
+                'GEVERSON DA COSTA GONCALVES',
+                '3G SERVICOS DE LIMPEZA LTDA',
+                'AGRO SANTA PRODUTOS AGROPECUARIOS LTDA',
+                'JONAS DA SILVA XAVIER LTDA',
+                'PAULO FIDENCIO MARTINS 12590867808',
+                'IGREJA EVANGELICA PENTECOSTAL O BRASIL PARA CRISTO',
+                'VICARE MERCEARIA LTDA',
+                'NUME ESPACO BOTANICO LTDA',
+                'LUCIANA CRISTINA CARNIETO',
+                'CARITAS ARQUIDIOCESANA DE BOTUCATU',
+                'LUIZ FERNANDO CORSATTO SACOMANI',
+                'RODRIGO CARLOS FRANCO MINOZZI LTDA',
+                'CLAUDIA BUENO DOS SANTOS ANDRADE',
+                'ANGELICA MARTINS PASCHOA PESSINI',
+                'F. A. ROCHA PIZZARIA LTDA',
+                'BIANCA RAMOS ZERBINATO',
+                'AMBROZIO MARMORES E GRANITOS LTDA',
+                'VALDECI DA COSTA ADEGA',
+                'SANTOS & ALBUQUERQUE LTDA',
+                'PADARIA NOVA ANTARTICA LTDA',
+                'AJ ODONTOLOGIA LTDA',
+                'LUCIMAR DOS SANTOS BATISTA ZEMINIAN',
+                'MAICON LEANDRO COLAUTO',
+                'KEVIN PATRICK DE SOUZA MELLO',
+                'CLAUDIO ROGERIO SIQUEIRA',
+                'MARCIA APARECIDA MARTINS DA SILVA',
+                'ELZA APARECIDA DORADO DE BARROS',
+                'FARMACUESTA REFLORENDA LTDA',
+                'FERNANDA JOCASTRA MORATO DO AMARAL',
+                'DROGARIA FARMALIFE BOTUCATU LTDA',
+                'ROSANGELA APARECIDA BARBOSA',
+                'N.C TEODORO BOLOS LTDA',
+                'ILSSO DE LIMA & CIA LTDA',
+                'ROSIMERI CRISTINA SILVERIO ROVERE 52.626.186',
+                'VECOL VEICULOS LTDA',
+                'ESTIMAVET MANIPULACAO VETERINARIA LTDA',
+                'J.C. SANTOS BALANCAS',
+                'TIAGO DA COSTA PRANDO',
+                'ANANIAS SANTIAGO DE OLIVEIRA FILHO',
+                'DROGARIA FARMACUESTA BOTUCATU LTDA',
+                'LUANA CORREA BELOTI',
+                'LUCIAN MORALES MAESTA',
+                'EDILENE CRISTINA BOTARI',
+                'ADEGA LUCHES SANTA CECILIA LTDA',
+                'LUIS GUSTAVO ROSA',
+                'CELSO SOARES MORENO',
+                'ZILO COMERCIO DE GAS LTDA',
+                'FABIO DONIZETI SERRANO 18705988810',
+                'CRISTINA DA SILVA RODRIGUES',
+                'FLORA BOTUCATU COMERCIO DE FLORES E PLANTAS LTDA',
+                'ISABELA DA CUNHA ZERBINATO 43060351821',
+                'MARA CANDELARIA DOMINGUES DA SILVA',
+                'LUCINEIA DE LOURDES DE MATOS SIMIONATO 25100257830',
+                'MARCIA REGINA DE LIMA THOMAZ',
+                'JULIO PEDRO DA SILVA',
+                'MARISTEN COM. DE ROUPAS LTDA',
+                'ANA CAROLINA RIBEIRO DA ROSA 47129461802',
+                'SIDNEY RAFAEL BIAZON',
+                'CLAUDIA REGINA CORREA',
+                'RENATA BALIVO ISQUI',
+                'BENEDITO VITORINO DE ALMEIDA E CIA LTDA',
+                'ROBIN RIBEIRO PIRES',
+                'WANDERLEY DE MATOS',
+                'RENATA NERY AGUIAR',
+                'C&A MODAS S.A.',
+                'FERNANDA SAUER SARTOR',
+                'GUILHERME BARRETO',
+                'ROSEMEIRE TARDIVO',
+                'INSTITUTO CONTEXTUALIZE LTDA',
+                'ELAINE RICCI GEROLDI REBELATO',
+                'SIDNEI DA SILVA VIEIRA RESTAURANTE',
+                'HELENA CAROLINA CHALO BARBOSA RICARDO 286.946.578-56',
+                'JULIA CASSEMIRO BRIQUEZI 47152852820',
+                'EVANDRO APARECIDO CELESTINO',
+                'CAMILA GABRIELE BAPTISTA CARVALHO DA SILVA',
+                'AGROCOMERCIAL TECPAR COMERCIO DE MADEIRA LTDA',
+                'ANA JOICE DE CAMARGO GRIGOLATTO',
+                'ELIEZER',
+                'NATALY REGINA DE OLIVEIRA CORDEIRO',
+                'MIKAELLA FRANCISCO GUASSU',
+                'MARIANA BORTOLIN COLOMBO CAZARIN',
+                'GENARI COMERCIO DE RACOES E PRODUTOS VETERINARIOS LTDA',
+                'NATAL BENEDITO FORTI',
+                'CAMILA GABRIELE BAPTISTA CARVALHO DA SILVA',
+                'ARIELE FOGACA',
+                'MARCIA DE JESUS FOGUEL',
+                'VIDROCOR TINTAS E FERRAMENTAS LTDA.',
+                'PANIFICADORA RAINHA DE BOTUCATU LTDA',
+                'CARLA REGINA CARMO SANTOS',
+                'RAMONA BASTOS BERNARDO VETERINARIA',
+                'PRAIA SPORTS BEACH TENIS',
+                'CELIA REGINA GARCIA 27397691803',
+                'COLINO SERVICOS ESTETICOS AVANCADOS LTDA',
+                'BANCO BRADESCO S.A.',
+                'LUCAS HENRIQUE MONTOYA',
+                'MS SARTORI CONFEITARIA LTDA',
+                'ARCELAO SCHAUFFLER DE OLIVEIRA',
+                'JHONATAN SOUZA SAMPAIO',
+                'GUILHERME MONTEIRO DA SILVA'
+            ];
+            
+            const mockD01 = [];
+            const mockD02 = [];
+
+            for (let i = 0; i < realNames.length; i++) {
+                const isNew = Math.random() > 0.9;
+                const market = mercados[Math.floor(Math.random() * mercados.length)];
+                const clientName = realNames[i];
+                const cnpjDemo = `DEMO-${1000 + i}`;
+                
+                // D01 Base Logic (Ajustado para ciclo mais rápido de reconhecimento)
+                const diasUltimo = Math.floor(Math.random() * 200);
+                // Menos tolerância: até 30 dias = nota 5, até 60 dias = nota 4...
+                let R = diasUltimo <= 30 ? 5 : diasUltimo <= 60 ? 4 : diasUltimo <= 90 ? 3 : diasUltimo <= 120 ? 2 : 1;
+                
+                const ped3m = isNew ? Math.floor(Math.random() * 2) + 1 : Math.floor(Math.random() * 6);
+                let F = ped3m >= 4 ? 5 : ped3m === 3 ? 4 : ped3m === 2 ? 3 : ped3m === 1 ? 2 : 1;
+                
+                const gasto3m = ped3m * (500 + Math.random() * 3000);
+                let M = gasto3m > 10000 ? 5 : gasto3m > 5000 ? 4 : gasto3m > 2000 ? 3 : gasto3m > 1000 ? 2 : 1;
+                
+                const ped3mAnt = isNew ? 0 : ped3m + Math.floor(Math.random() * 5 - 2);
+                const gasto3mAnt = isNew ? 0 : gasto3m + (Math.random() * 6000 - 3000);
+                
+                const tendFreq = isNew ? 'Novo no período' : (ped3m === 0 && ped3mAnt === 0) ? 'Sem compras' : ped3m > ped3mAnt ? 'Crescendo' : ped3m < ped3mAnt ? 'Caindo' : 'Estável';
+                const tendGasto = isNew ? 'Novo no período' : (gasto3m === 0 && gasto3mAnt === 0) ? 'Sem compras' : gasto3m > gasto3mAnt ? 'Crescendo' : gasto3m < gasto3mAnt ? 'Caindo' : 'Estável';
+                
+                const notaRFM = Math.round((R + F + M) / 3);
+
+                const names = ['Ana Silva', 'Carlos Santos', 'Fernanda Lima', 'Roberto Alves', 'Mariana Costa', 'João Pedro', 'Beatriz Souza', 'Rafael Mendes', 'Camila Rocha', 'Lucas Martins'];
+                const comprador = names[Math.floor(Math.random() * names.length)];
+                const tel = `(11) 9${Math.floor(8000 + Math.random()*1999)}-${Math.floor(1000 + Math.random()*8999)}`;
+                const email = `${comprador.split(' ')[0].toLowerCase()}@${clientName.split(' ')[0].toLowerCase().replace(/[^a-z]/g, '') || 'empresa'}.com.br`;
+
+                mockD01.push({
+                    'CNPJ matriz': cnpjDemo,
+                    'Cliente': clientName,
+                    'Comprador': comprador,
+                    'Telefone': tel,
+                    'Email': email,
+                    'Mercado': market,
+                    'Último pedido confirmado': `2026-${Math.floor(Math.random()*12+1).toString().padStart(2,'0')}-01`,
+                    'Dias desde último pedido': diasUltimo,
+                    'Pedidos últimos 3m': ped3m,
+                    'Pedidos 3m anteriores': Math.max(0, ped3mAnt),
+                    'Tendência frequência': tendFreq,
+                    'Gasto últimos 3m (R$)': gasto3m,
+                    'Gasto 3m anteriores (R$)': Math.max(0, gasto3mAnt),
+                    'Tendência gasto': tendGasto,
+                    'Nota R': R,
+                    'Nota F': F,
+                    'Nota M': M,
+                    'Código R-F-M': `${R}-${F}-${M}`,
+                    'Nota RFM': notaRFM
+                });
+
+                // D02 Base Logic
+                const pedHist = ped3m + Math.max(0, ped3mAnt) + Math.floor(Math.random() * 5);
+                const mediaIndiv = pedHist >= 2 ? Math.floor(15 + Math.random() * 60) : 0; // Média individual menor
+                
+                let status = 'Histórico insuficiente';
+                if (pedHist >= 2) {
+                    if (diasUltimo <= mediaIndiv) status = 'Ativo';
+                    else if (diasUltimo <= 2 * mediaIndiv) status = 'Inativo recente';
+                    else status = 'Inativo antigo';
+                }
+
+                mockD02.push({
+                    'CNPJ matriz': cnpjDemo,
+                    'Cliente': clientName,
+                    'Comprador': comprador,
+                    'Telefone': tel,
+                    'Email': email,
+                    'Mercado': market,
+                    'Último pedido confirmado': `2026-${Math.floor(Math.random()*12+1).toString().padStart(2,'0')}-01`,
+                    'Dias sem comprar': diasUltimo,
+                    'Pedidos confirmados histórico': pedHist,
+                    'Média individual entre pedidos (dias)': mediaIndiv,
+                    'Status de atividade': status
+                });
+            }
+
+            processData(mockD01, 'd01');
+            processData(mockD02, 'd02');
+        }
+
+        function populateMarketFilters() {
+            const options = Array.from(state.markets).sort().map(m => `<option value="${m}">${m}</option>`).join('');
+            
+            // Clear and set to avoid duplicates on re-upload
+            const filterD01 = document.getElementById('filter-d01-mercado');
+            const filterD02 = document.getElementById('filter-d02-mercado');
+            
+            filterD01.innerHTML = '<option value="Todos">Todos os Mercados</option>' + options;
+            filterD02.innerHTML = '<option value="Todos">Todos os Mercados</option>' + options;
+        }
+
+        function destroyChart(id) {
+            if (state.charts[id]) {
+                state.charts[id].destroy();
+            }
+        }
+
+        function resetFiltersD01() {
+            document.getElementById('filter-d01-mercado').value = 'Todos';
+            document.getElementById('filter-d01-tendencia').value = 'Todos';
+            document.getElementById('filter-d01-cliente').value = '';
+            clearBubbleFilter(); // This calls applyFiltersD01() automatically
+        }
+
+        function clearBubbleFilter() {
+            state.d01.activeBubble = null;
+            document.getElementById('d01-bubble-filter-indicator').classList.add('hidden');
+            applyFiltersD01();
+        }
+
+        function applyFiltersD01() {
+            const mkt = document.getElementById('filter-d01-mercado').value;
+            const tend = document.getElementById('filter-d01-tendencia').value;
+            const search = document.getElementById('filter-d01-cliente').value.toLowerCase();
+
+            state.d01.filtered = state.d01.raw.filter(row => {
+                let pass = true;
+                if (mkt !== 'Todos' && row['Mercado'] !== mkt) pass = false;
+                if (tend !== 'Todos' && row['Tendência gasto'] !== tend) pass = false;
+                
+                if (state.d01.activeBubble) {
+                    if (row['Nota M'] !== state.d01.activeBubble.M || row['Nota F'] !== state.d01.activeBubble.F) {
+                        pass = false;
+                    }
+                }
+
+                if (search) {
+                    const clientName = (row['Cliente'] || '').toLowerCase();
+                    const clientId = (row['CNPJ matriz'] || '').toLowerCase();
+                    if (!clientName.includes(search) && !clientId.includes(search)) {
+                        pass = false;
+                    }
+                }
+                return pass;
+            });
+
+            updateDashboard01();
+        }
+
+        function updateDashboard01() {
+            const data = state.d01.filtered;
+            
+            const totalClients = data.length;
+            const gasto3m = data.reduce((sum, row) => sum + (row['Gasto últimos 3m (R$)'] || 0), 0);
+            const gastoAnt = data.reduce((sum, row) => sum + (row['Gasto 3m anteriores (R$)'] || 0), 0);
+            const varGasto = gastoAnt === 0 ? 0 : ((gasto3m - gastoAnt) / gastoAnt);
+            const totalPed = data.reduce((sum, row) => sum + (row['Pedidos últimos 3m'] || 0), 0);
+
+            document.getElementById('kpi-d01-clientes').innerText = formatNum(totalClients);
+            document.getElementById('kpi-d01-gasto3m').innerText = formatMoney(gasto3m);
+            document.getElementById('kpi-d01-pedidos').innerText = formatNum(totalPed);
+            
+            const varEl = document.getElementById('kpi-d01-var-gasto');
+            if(gastoAnt === 0) {
+                varEl.innerText = "vs. 3m anteriores: N/D";
+                varEl.className = "text-xs font-medium mt-2 text-gray-500";
+            } else {
+                varEl.innerText = `vs. 3m anteriores: ${varGasto > 0 ? '+' : ''}${formatPct(varGasto)}`;
+                varEl.className = `text-xs font-medium mt-2 ${varGasto >= 0 ? 'text-green-600' : 'text-red-600'}`;
+            }
+
+            renderTableD01(data);
+            renderChartD01_Mercado(data);
+            renderChartD01_FxM(data);
+            renderChartD01_Trends(data);
+            renderChartD01_Compare(gasto3m, gastoAnt);
+        }
+
+        function renderChartD01_Mercado(data) {
+            destroyChart('chartD01-mercadoGasto');
+            const mktSpend = {};
+            data.forEach(r => {
+                const m = r['Mercado'] || 'Outros';
+                mktSpend[m] = (mktSpend[m] || 0) + (r['Gasto últimos 3m (R$)'] || 0);
+            });
+            
+            const sorted = Object.entries(mktSpend).sort((a,b) => b[1]-a[1]).slice(0,6);
+
+            const ctx = document.getElementById('chartD01-mercadoGasto').getContext('2d');
+            state.charts['chartD01-mercadoGasto'] = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sorted.map(i => i[0]),
+                    datasets: [{
+                        label: 'Gasto R$',
+                        data: sorted.map(i => i[1]),
+                        backgroundColor: colors.orange,
+                        borderRadius: 4
+                    }]
+                },
+                options: { indexAxis: 'y', maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+        }
+
+        function renderChartD01_FxM(data) {
+            destroyChart('chartD01-fxm');
+            const matrix = {};
+            data.forEach(r => {
+                const F = r['Nota F'];
+                const M = r['Nota M'];
+                if(F && M) {
+                    const key = `${M}-${F}`;
+                    matrix[key] = (matrix[key] || 0) + 1;
+                }
+            });
+
+            const bubbleData = Object.keys(matrix).map(k => {
+                const [m, f] = k.split('-');
+                return { x: parseInt(m), y: parseInt(f), r: Math.max(5, matrix[k] * 2) };
+            });
+
+            const ctx = document.getElementById('chartD01-fxm').getContext('2d');
+            state.charts['chartD01-fxm'] = new Chart(ctx, {
+                type: 'bubble',
+                data: {
+                    datasets: [{
+                        label: 'Clientes',
+                        data: bubbleData,
+                        backgroundColor: function(context) {
+                            const val = context.raw;
+                            if (!val) return colors.gray;
+                            const score = val.x + val.y;
+                            if (score >= 8) return 'rgba(16, 185, 129, 0.7)'; // Verde (Ótimo)
+                            if (score >= 6) return 'rgba(59, 130, 246, 0.7)'; // Azul (Bom)
+                            if (score >= 4) return 'rgba(245, 158, 11, 0.7)'; // Laranja (Atenção)
+                            return 'rgba(239, 68, 68, 0.7)'; // Vermelho (Risco)
+                        },
+                        borderColor: function(context) {
+                            const val = context.raw;
+                            if (!val) return colors.gray;
+                            const score = val.x + val.y;
+                            if (score >= 8) return '#10B981';
+                            if (score >= 6) return '#3B82F6';
+                            if (score >= 4) return '#F59E0B';
+                            return '#EF4444';
+                        },
+                        hoverBackgroundColor: function(context) {
+                            const val = context.raw;
+                            if (!val) return colors.gray;
+                            const score = val.x + val.y;
+                            if (score >= 8) return 'rgba(16, 185, 129, 1)';
+                            if (score >= 6) return 'rgba(59, 130, 246, 1)';
+                            if (score >= 4) return 'rgba(245, 158, 11, 1)';
+                            return 'rgba(239, 68, 68, 1)';
+                        }
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    onClick: (e, elements, chart) => {
+                        if (elements && elements.length > 0) {
+                            const dataPoint = chart.data.datasets[0].data[elements[0].index];
+                            state.d01.activeBubble = { M: dataPoint.x, F: dataPoint.y };
+                            document.getElementById('d01-bubble-filter-indicator').classList.remove('hidden');
+                            document.getElementById('bubble-filter-text').innerText = `Monetário ${dataPoint.x}, Frequência ${dataPoint.y}`;
+                            applyFiltersD01();
+                        }
+                    },
+                    scales: {
+                        x: { title: { display: true, text: 'Nota Monetário (M)' }, min: 0.5, max: 5.5, ticks: {stepSize: 1} },
+                        y: { title: { display: true, text: 'Nota Frequência (F)' }, min: 0.5, max: 5.5, ticks: {stepSize: 1} }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(ctx) {
+                                    const count = matrix[`${ctx.raw.x}-${ctx.raw.y}`];
+                                    return `M${ctx.raw.x} / F${ctx.raw.y}: ${count} clientes`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderChartD01_Trends(data) {
+            destroyChart('chartD01-trends');
+            const cats = ['Crescendo', 'Estável', 'Caindo', 'Novo no período', 'Sem compras'];
+            const freq = {Crescendo:0, Estável:0, Caindo:0, 'Novo no período':0, 'Sem compras':0};
+            const gasto = {Crescendo:0, Estável:0, Caindo:0, 'Novo no período':0, 'Sem compras':0};
+
+            data.forEach(r => {
+                if(freq[r['Tendência frequência']] !== undefined) freq[r['Tendência frequência']]++;
+                if(gasto[r['Tendência gasto']] !== undefined) gasto[r['Tendência gasto']]++;
+            });
+
+            const ctx = document.getElementById('chartD01-trends').getContext('2d');
+            state.charts['chartD01-trends'] = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: cats,
+                    datasets: [
+                        { label: 'Freq. de Pedidos', data: cats.map(c => freq[c]), backgroundColor: colors.navy, borderRadius: 2 },
+                        { label: 'Gasto R$', data: cats.map(c => gasto[c]), backgroundColor: colors.orange, borderRadius: 2 }
+                    ]
+                },
+                options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+            });
+        }
+
+        function renderChartD01_Compare(g3m, gAnt) {
+            destroyChart('chartD01-compare');
+            const ctx = document.getElementById('chartD01-compare').getContext('2d');
+            state.charts['chartD01-compare'] = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['3m Anteriores', 'Últimos 3m'],
+                    datasets: [{
+                        label: 'Gasto Total (R$)',
+                        data: [gAnt, g3m],
+                        backgroundColor: [colors.slate, colors.navy],
+                        borderRadius: 4
+                    }]
+                },
+                options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+        }
+
+        function renderTableD01(data) {
+            const tbody = document.getElementById('table-d01-body');
+            document.getElementById('d01-table-info').innerText = `Mostrando ${data.length} registros`;
+            
+            const sorted = [...data].sort((a,b) => (b['Gasto últimos 3m (R$)']||0) - (a['Gasto últimos 3m (R$)']||0)).slice(0, 50);
+            
+            let html = '';
+            sorted.forEach(row => {
+                const tendClass = row['Tendência gasto'] === 'Crescendo' ? 'text-green-600 font-medium' : row['Tendência gasto'] === 'Caindo' ? 'text-red-600 font-medium' : 'text-gray-500';
+                
+                const comp = row['Comprador'] || '-';
+                const email = row['Email'] || '-';
+                const tel = row['Telefone'] || '-';
+
+                html += `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-4 py-3">
+                            <div class="font-medium text-gray-900">${row['Cliente'] || '-'}</div>
+                            <div class="text-[10px] text-gray-400">${row['CNPJ matriz']}</div>
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="font-medium text-gray-800 text-xs">${comp}</div>
+                            <div class="text-[10px] text-gray-500">${tel} <br> ${email}</div>
+                        </td>
+                        <td class="px-4 py-3 text-xs text-gray-600">${row['Mercado'] || '-'}</td>
+                        <td class="px-4 py-3 text-xs text-gray-600">${row['Último pedido confirmado'] || '-'}</td>
+                        <td class="px-4 py-3 text-right font-medium text-gray-900">${formatMoney(row['Gasto últimos 3m (R$)'])}</td>
+                        <td class="px-4 py-3 text-center text-xs ${tendClass}">${row['Tendência gasto'] || '-'}</td>
+                        <td class="px-4 py-3 text-center text-xs text-gray-600">${row['Pedidos últimos 3m'] || 0}</td>
+                        <td class="px-4 py-3 text-center text-xs font-mono bg-gray-100 rounded">${row['Código R-F-M'] || '-'}</td>
+                        <td class="px-4 py-3 text-center font-bold text-stampare-navy">${row['Nota RFM'] || '-'}</td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        function resetFiltersD02() {
+            document.getElementById('filter-d02-mercado').value = 'Todos';
+            document.getElementById('filter-d02-status').value = 'Todos';
+            document.getElementById('filter-d02-cliente').value = '';
+            applyFiltersD02();
+        }
+
+        function applyFiltersD02() {
+            const mkt = document.getElementById('filter-d02-mercado').value;
+            const status = document.getElementById('filter-d02-status').value;
+            const search = document.getElementById('filter-d02-cliente').value.toLowerCase();
+
+            state.d02.filtered = state.d02.raw.filter(row => {
+                let pass = true;
+                if (mkt !== 'Todos' && row['Mercado'] !== mkt) pass = false;
+                if (status !== 'Todos' && row['Status de atividade'] !== status) pass = false;
+                
+                if (search) {
+                    const clientName = (row['Cliente'] || '').toLowerCase();
+                    const clientId = (row['CNPJ matriz'] || '').toLowerCase();
+                    if (!clientName.includes(search) && !clientId.includes(search)) {
+                        pass = false;
+                    }
+                }
+                return pass;
+            });
+
+            updateDashboard02();
+        }
+
+        function updateDashboard02() {
+            const data = state.d02.filtered;
+            
+            const total = data.length;
+            const ativos = data.filter(r => r['Status de atividade'] === 'Ativo').length;
+            const recentes = data.filter(r => r['Status de atividade'] === 'Inativo recente').length;
+            const antigos = data.filter(r => r['Status de atividade'] === 'Inativo antigo').length;
+            const insuf = data.filter(r => r['Status de atividade'] === 'Histórico insuficiente').length;
+            const confiavel = total - insuf;
+
+            document.getElementById('kpi-d02-total').innerText = formatNum(total);
+            document.getElementById('kpi-d02-ativos').innerText = formatNum(ativos);
+            document.getElementById('kpi-d02-recentes').innerText = formatNum(recentes);
+            document.getElementById('kpi-d02-antigos').innerText = formatNum(antigos);
+            document.getElementById('kpi-d02-insuf').innerText = formatNum(insuf);
+
+            document.getElementById('kpi-d02-ativos-pct').innerText = confiavel > 0 ? `${formatPct(ativos/confiavel)} do total confiável` : '0%';
+            document.getElementById('kpi-d02-recentes-pct').innerText = confiavel > 0 ? `${formatPct(recentes/confiavel)} do total confiável` : '0%';
+            document.getElementById('kpi-d02-antigos-pct').innerText = confiavel > 0 ? `${formatPct(antigos/confiavel)} do total confiável` : '0%';
+
+            renderChartD02_Status(ativos, recentes, antigos, insuf);
+            renderChartD02_Mercado(data);
+            renderChartD02_Scatter(data);
+            renderTableD02(data);
+        }
+
+        function renderChartD02_Status(a, r, an, i) {
+            destroyChart('chartD02-status');
+            const ctx = document.getElementById('chartD02-status').getContext('2d');
+            state.charts['chartD02-status'] = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Ativo', 'Inativo Recente', 'Inativo Antigo', 'Histórico Insuficiente'],
+                    datasets: [{
+                        data: [a, r, an, i],
+                        backgroundColor: [colors.green, colors.orange, colors.red, colors.gray],
+                        borderWidth: 0
+                    }]
+                },
+                options: { maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom' } } }
+            });
+        }
+
+        function renderChartD02_Mercado(data) {
+            destroyChart('chartD02-mercado');
+            const mktObj = {};
+            data.forEach(r => {
+                const m = r['Mercado'] || 'Outros';
+                if(!mktObj[m]) mktObj[m] = { Ativo:0, 'Inativo recente':0, 'Inativo antigo':0, 'Histórico insuficiente':0 };
+                const st = r['Status de atividade'];
+                if(mktObj[m][st] !== undefined) mktObj[m][st]++;
+            });
+
+            const labels = Object.keys(mktObj);
+            const datasetA = labels.map(l => mktObj[l]['Ativo']);
+            const datasetR = labels.map(l => mktObj[l]['Inativo recente']);
+            const datasetAn = labels.map(l => mktObj[l]['Inativo antigo']);
+
+            const ctx = document.getElementById('chartD02-mercado').getContext('2d');
+            state.charts['chartD02-mercado'] = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Ativo', data: datasetA, backgroundColor: colors.green },
+                        { label: 'Inat. Recente', data: datasetR, backgroundColor: colors.orange },
+                        { label: 'Inat. Antigo', data: datasetAn, backgroundColor: colors.red }
+                    ]
+                },
+                options: { 
+                    maintainAspectRatio: false, 
+                    scales: { x: { stacked: true }, y: { stacked: true } }
+                }
+            });
+        }
+
+        function renderChartD02_Scatter(data) {
+            destroyChart('chartD02-scatter');
+            
+            const validData = data.filter(r => r['Status de atividade'] !== 'Histórico insuficiente');
+            
+            const pointsA = [];
+            const pointsR = [];
+            const pointsAn = [];
+            let maxMedia = 10;
+
+            validData.forEach(r => {
+                const x = r['Média individual entre pedidos (dias)'] || 0;
+                const y = r['Dias sem comprar'] || 0;
+                if(x > maxMedia) maxMedia = x;
+
+                const pt = {x: x, y: y, raw: r};
+                if(r['Status de atividade'] === 'Ativo') pointsA.push(pt);
+                else if(r['Status de atividade'] === 'Inativo recente') pointsR.push(pt);
+                else pointsAn.push(pt);
+            });
+
+            const line1 = [{x:0, y:0}, {x:maxMedia, y:maxMedia}];
+            const line2 = [{x:0, y:0}, {x:maxMedia, y:maxMedia*2}];
+
+            const ctx = document.getElementById('chartD02-scatter').getContext('2d');
+            state.charts['chartD02-scatter'] = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        { label: 'Ativo', data: pointsA, backgroundColor: colors.green },
+                        { label: 'Inat. Recente', data: pointsR, backgroundColor: colors.orange },
+                        { label: 'Inat. Antigo', data: pointsAn, backgroundColor: colors.red },
+                        { label: 'L1: Y=X', data: line1, type: 'line', borderColor: '#CBD5E1', borderDash: [5,5], pointRadius: 0, fill: false },
+                        { label: 'L2: Y=2X', data: line2, type: 'line', borderColor: '#94A3B8', borderDash: [5,5], pointRadius: 0, fill: false }
+                    ]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { title: { display: true, text: 'Média Individual de Compra (Dias)' } },
+                        y: { title: { display: true, text: 'Dias Sem Comprar' } }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(ctx) {
+                                    if(ctx.datasetIndex >= 3) return ''; 
+                                    const row = ctx.raw.raw;
+                                    return `${row['Cliente']}: ${ctx.raw.y} dias sem comprar (Média: ${ctx.raw.x})`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderTableD02(data) {
+            const tbody = document.getElementById('table-d02-body');
+            document.getElementById('d02-table-info').innerText = `Mostrando ${data.length} registros`;
+            
+            const orderMap = {'Inativo antigo': 1, 'Inativo recente': 2, 'Ativo': 3, 'Histórico insuficiente': 4};
+            
+            const sorted = [...data].sort((a,b) => {
+                const s1 = orderMap[a['Status de atividade']] || 9;
+                const s2 = orderMap[b['Status de atividade']] || 9;
+                if(s1 !== s2) return s1 - s2;
+                
+                const m1 = a['Média individual entre pedidos (dias)'] || 1;
+                const m2 = b['Média individual entre pedidos (dias)'] || 1;
+                const r1 = (a['Dias sem comprar'] || 0) / m1;
+                const r2 = (b['Dias sem comprar'] || 0) / m2;
+                return r2 - r1;
+            }).slice(0, 50);
+            
+            let html = '';
+            sorted.forEach(row => {
+                const st = row['Status de atividade'];
+                const stColor = st === 'Ativo' ? 'bg-green-100 text-green-800' : 
+                                st === 'Inativo recente' ? 'bg-orange-100 text-orange-800' : 
+                                st === 'Inativo antigo' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-600';
+                
+                const dias = row['Dias sem comprar'] || 0;
+                const media = row['Média individual entre pedidos (dias)'] || 0;
+                let razao = 'N/A';
+                if(st !== 'Histórico insuficiente' && media > 0) {
+                    razao = (dias / media).toFixed(2) + 'x';
+                }
+
+                const comp = row['Comprador'] || '-';
+                const email = row['Email'] || '-';
+                const tel = row['Telefone'] || '-';
+
+                html += `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-4 py-3 text-xs">
+                            <span class="px-2 py-1 rounded-full font-medium ${stColor}">${st}</span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="font-medium text-gray-900">${row['Cliente'] || '-'}</div>
+                            <div class="text-[10px] text-gray-400">${row['CNPJ matriz']}</div>
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="font-medium text-gray-800 text-xs">${comp}</div>
+                            <div class="text-[10px] text-gray-500">${tel} <br> ${email}</div>
+                        </td>
+                        <td class="px-4 py-3 text-xs text-gray-600">${row['Mercado'] || '-'}</td>
+                        <td class="px-4 py-3 text-center text-xs text-gray-600">${row['Último pedido confirmado'] || '-'}</td>
+                        <td class="px-4 py-3 text-right font-medium text-gray-900">${dias}</td>
+                        <td class="px-4 py-3 text-right text-xs text-gray-600">${media > 0 ? media : 'N/A'}</td>
+                        <td class="px-4 py-3 text-right text-xs font-mono bg-gray-50">${razao}</td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        function exportD01ToCSV() {
+            if (!state.d01.filtered || state.d01.filtered.length === 0) return;
+            
+            const exportData = state.d01.filtered.map(r => ({
+                'ID': r['CNPJ matriz'],
+                'Cliente': r['Cliente'],
+                'Comprador': r['Comprador'] || '',
+                'Telefone': r['Telefone'] || '',
+                'Email': r['Email'] || '',
+                'Mercado': r['Mercado'],
+                'Último Pedido': r['Último pedido confirmado'],
+                'Dias sem comprar': r['Dias desde último pedido'],
+                'Pedidos 3m': r['Pedidos últimos 3m'],
+                'Gasto 3m (R$)': r['Gasto últimos 3m (R$)'],
+                'Tendência Gasto': r['Tendência gasto'],
+                'Nota R': r['Nota R'],
+                'Nota F': r['Nota F'],
+                'Nota M': r['Nota M'],
+                'Código RFM': r['Código R-F-M'],
+                'Nota Final': r['Nota RFM']
+            }));
+
+            // Adiciona BOM (Byte Order Mark) para o Excel abrir caracteres latinos/acentos corretamente
+            const csv = Papa.unparse(exportData);
+            const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csv], { type: 'text/csv;charset=utf-8;' }); 
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'STAMPARE_Analise_RFM.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function exportD02ToCSV() {
+            if (!state.d02.filtered || state.d02.filtered.length === 0) return;
+            
+            const exportData = state.d02.filtered.map(r => ({
+                'ID': r['CNPJ matriz'],
+                'Cliente': r['Cliente'],
+                'Comprador': r['Comprador'] || '',
+                'Telefone': r['Telefone'] || '',
+                'Email': r['Email'] || '',
+                'Status de atividade': r['Status de atividade'],
+                'Mercado': r['Mercado'],
+                'Último Pedido': r['Último pedido confirmado'],
+                'Dias sem comprar': r['Dias sem comprar'],
+                'Histórico Pedidos': r['Pedidos confirmados histórico'],
+                'Média Indiv. (dias)': r['Média individual entre pedidos (dias)']
+            }));
+
+            // Adiciona BOM (Byte Order Mark) para o Excel abrir caracteres latinos/acentos corretamente
+            const csv = Papa.unparse(exportData);
+            const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csv], { type: 'text/csv;charset=utf-8;' }); 
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'STAMPARE_Analise_Risco.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+    </script>
+</body>
+</html>
