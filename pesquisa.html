@@ -1,1 +1,899 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesquisa de Mercado & Posicionamento | V4 Silva Anchieta & Co.</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome (Icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2C328E',
+                        secondary: '#FF7B1D',
+                        tertiary: '#FFFFFF',
+                        v4red: '#E50914',
+                        dark: '#0f172a',
+                        light: '#f8fafc',
+                    },
+                    fontFamily: {
+                        heading: ['Outfit', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1B3859; 
+            border-radius: 5px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2C328E; 
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* Text Gradient */
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(90deg, #2C328E, #FF7B1D);
+        }
+
+        /* Glassmorphism */
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Scroll Reveal Utility */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .reveal-left { transform: translateX(-50px); }
+        .reveal-right { transform: translateX(50px); }
+        .reveal-left.active, .reveal-right.active { transform: translateX(0); }
+
+        /* Shine Effect for Buttons */
+        .btn-shine {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-shine::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+            transform: skewX(-20deg);
+            animation: shine 3s infinite;
+        }
+        @keyframes shine {
+            0% { left: -100%; }
+            20% { left: 200%; }
+            100% { left: 200%; }
+        }
+
+        /* Dynamic Blobs Background */
+        .blob {
+            position: absolute;
+            filter: blur(80px);
+            z-index: 0;
+            opacity: 0.4;
+            animation: moveBlob 15s infinite alternate;
+        }
+        @keyframes moveBlob {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, -50px) scale(1.1); }
+        }
+
+        /* Slow Zoom Hero */
+        .slow-zoom {
+            animation: slowZoom 20s ease-in-out infinite alternate;
+        }
+        @keyframes slowZoom {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
+
+        /* Tooltip Custom */
+        .tooltip-trigger {
+            position: relative;
+            cursor: help;
+            border-bottom: 1px dashed #2C328E;
+            font-weight: 600;
+            color: #2C328E;
+        }
+        .tooltip-trigger .tooltip-content {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #0f172a;
+            color: #fff;
+            text-align: center;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            transition: all 0.3s;
+            z-index: 50;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+        .tooltip-trigger:hover .tooltip-content {
+            visibility: visible;
+            opacity: 1;
+            bottom: 150%;
+        }
+
+        /* Line Clamp */
+        .line-clamp-content {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        .line-clamp-content.expanded {
+            -webkit-line-clamp: unset;
+        }
+
+        /* Draggable Table */
+        .draggable-container {
+            cursor: grab;
+        }
+        .draggable-container:active {
+            cursor: grabbing;
+        }
+
+        /* Funnel CSS */
+        .funnel-layer {
+            clip-path: polygon(0 0, 100% 0, 85% 100%, 15% 100%);
+            transition: all 0.3s ease;
+        }
+        .funnel-layer:hover {
+            transform: scale(1.02);
+            filter: brightness(1.1);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Sticky Header -->
+    <header id="main-header" class="fixed w-full top-0 z-50 transition-all duration-300 py-4 bg-white shadow-md">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <!-- Client Logo -->
+            <div class="w-40 transition-transform duration-300 hover:scale-105 cursor-pointer">
+                <img src="https://i.imgur.com/oiekiyj.png" alt="Casa Das Embalagens Botucatu" class="h-auto w-full object-contain">
+            </div>
+            <!-- Agency Logo -->
+            <div class="w-12 transition-transform duration-300 hover:scale-105 cursor-pointer">
+                <img src="https://brand.v4company.com/_next/image?url=%2Fimages%2Flogos%2Fsimbolo-company.webp&w=256&q=75" alt="V4 Company" class="h-auto w-full object-contain filter brightness-0">
+            </div>
+        </div>
+    </header>
+
+    <!-- Sessão 01: Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center overflow-hidden bg-dark">
+        <div class="absolute inset-0 z-0">
+            <!-- Blobs -->
+            <div class="blob bg-primary w-[500px] h-[500px] rounded-full top-[-100px] left-[-100px]"></div>
+            <div class="blob bg-secondary w-[400px] h-[400px] rounded-full bottom-[-50px] right-[-50px]" style="animation-delay: -5s;"></div>
+            <div class="absolute inset-0 bg-[#0f172a]/80 z-10"></div>
+        </div>
+        <div class="relative z-20 text-center px-6 reveal">
+            <h1 class="text-5xl md:text-7xl font-extrabold text-white mb-6 leading-tight">
+                Pesquisa de Mercado <br> <span class="text-gradient">& Posicionamento</span>
+            </h1>
+            <div class="w-24 h-1 bg-secondary mx-auto rounded-full mb-8"></div>
+            <a href="#sumario" class="btn-shine bg-primary hover:bg-blue-800 text-white font-bold py-4 px-10 rounded-full shadow-lg hover:-translate-y-1 hover:shadow-2xl transition-all inline-flex items-center gap-2">
+                Iniciar Apresentação <i class="fas fa-arrow-down"></i>
+            </a>
+        </div>
+    </section>
+
+    <!-- Sessão 02: Sumário -->
+    <section id="sumario" class="py-24 bg-white relative z-10">
+        <div class="container mx-auto px-6">
+            <div class="mb-16 text-center reveal">
+                <h2 class="text-4xl font-bold text-primary mb-2">Sumário</h2>
+                <p class="text-gray-500 flex items-center justify-center gap-2">
+                    <i class="far fa-clock text-secondary"></i> Duração Estimada: 1h30min
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <!-- Card 1 -->
+                <div class="bg-light p-10 rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 reveal reveal-left border-l-4 border-primary">
+                    <h3 class="text-2xl font-bold text-primary mb-6 flex items-center gap-3">
+                        <i class="fas fa-search-chart bg-primary/10 p-3 rounded-lg"></i> Pesquisa de Mercado
+                    </h3>
+                    <ul class="space-y-4 text-gray-700">
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-secondary"></i> Estudo dos seus concorrentes</li>
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-secondary"></i> Mercados atuais e potenciais</li>
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-secondary"></i> Público alvo mais assertivo</li>
+                    </ul>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-light p-10 rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 reveal reveal-right border-l-4 border-secondary">
+                    <h3 class="text-2xl font-bold text-primary mb-6 flex items-center gap-3">
+                        <i class="fas fa-bullseye bg-secondary/10 p-3 rounded-lg text-secondary"></i> Posicionamento
+                    </h3>
+                    <ul class="space-y-4 text-gray-700">
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-secondary"></i> Comparação do produto no mercado</li>
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-secondary"></i> Seus diferenciais competitivos</li>
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-secondary"></i> Sua <span class="tooltip-trigger">PUV<span class="tooltip-content">Proposta Única de Valor</span></span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sessão 03: Seu mercado -->
+    <section class="py-24 bg-gray-50 overflow-hidden">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold text-primary mb-12 text-center reveal">Seu mercado</h2>
+            
+            <div class="flex flex-col lg:flex-row gap-12 items-center mb-16">
+                <!-- Imagem -->
+                <div class="w-full lg:w-1/2 reveal reveal-left">
+                    <div class="relative rounded-2xl overflow-hidden shadow-2xl group cursor-pointer" onclick="openLightbox('https://botupapel.com/assets/hero-banner-botupapel.webp')">
+                        <img src="https://botupapel.com/assets/hero-banner-botupapel.webp" alt="Hero Banner Botupapel" class="w-full h-auto object-cover transform group-hover:scale-110 transition-transform duration-700">
+                        <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <i class="fas fa-search-plus text-white text-4xl"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Texto -->
+                <div class="w-full lg:w-1/2 reveal reveal-right">
+                    <div class="prose prose-lg text-gray-700">
+                        <p class="text-xl leading-relaxed mb-6">
+                            O mercado corporativo de suprimentos de higiene e limpeza profissional está em forte expansão, mas o modelo tradicional de commodities sofre com estagnação.
+                        </p>
+                        <div class="bg-white p-6 border-l-4 border-secondary rounded-r-lg shadow-sm mb-6">
+                            <p class="mb-0 font-medium">
+                                As vendas de saneantes atingiram <span class="text-primary font-bold text-2xl">R$ 38,3 bilhões</span> anuais (com projeção de +31,3% até 2029, chegando a R$ 50,1 bilhões) e o setor de higienização movimenta <span class="text-primary font-bold text-2xl">R$ 32 bilhões</span>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Consequência Estratégica -->
+            <div class="reveal">
+                <h3 class="text-2xl font-bold text-primary mb-8 border-b pb-4">Consequência estratégica:</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Item 1 -->
+                    <div class="bg-white p-6 rounded-xl shadow hover:-translate-y-1 transition-transform border-t-4 border-secondary group">
+                        <div class="w-10 h-10 bg-secondary text-white rounded-full flex items-center justify-center font-bold text-xl mb-4 group-hover:scale-110 transition-transform">1</div>
+                        <p class="text-gray-700 text-sm">A comunicação deixa de focar no consumidor <span class="tooltip-trigger">B2B<span class="tooltip-content">Business to Business (Venda Corporativa)</span></span> ("pedido chega até sua casa") e passa a focar em "por que trocar o seu fornecedor atual".</p>
+                    </div>
+                    <!-- Item 2 -->
+                    <div class="bg-white p-6 rounded-xl shadow hover:-translate-y-1 transition-transform border-t-4 border-secondary group">
+                        <div class="w-10 h-10 bg-secondary text-white rounded-full flex items-center justify-center font-bold text-xl mb-4 group-hover:scale-110 transition-transform">2</div>
+                        <p class="text-gray-700 text-sm">O marketing de retenção vira prioridade. Como a empresa perde 6% da base por mês, estancar essa sangria é mais barato do que captar novos clientes, pois recuperá-los exigirá tomar espaço de terceiros.</p>
+                    </div>
+                    <!-- Item 3 -->
+                    <div class="bg-white p-6 rounded-xl shadow hover:-translate-y-1 transition-transform border-t-4 border-secondary group">
+                        <div class="w-10 h-10 bg-secondary text-white rounded-full flex items-center justify-center font-bold text-xl mb-4 group-hover:scale-110 transition-transform">3</div>
+                        <p class="text-gray-700 text-sm">Sistema de gerenciamento de suprimentos integrado ao <span class="tooltip-trigger">ERP<span class="tooltip-content">Enterprise Resource Planning (Sistema de Gestão)</span></span> do cliente que ele pode fazer cotações, alçadas de aprovação, pedidos de forma automática, programação de compras recorrentes e relatórios de consumo numa única plataforma.</p>
+                    </div>
+                    <!-- Item 4 -->
+                    <div class="bg-white p-6 rounded-xl shadow hover:-translate-y-1 transition-transform border-t-4 border-secondary group">
+                        <div class="w-10 h-10 bg-secondary text-white rounded-full flex items-center justify-center font-bold text-xl mb-4 group-hover:scale-110 transition-transform">4</div>
+                        <p class="text-gray-700 text-sm">Estratégia de <span class="tooltip-trigger">Lock-in<span class="tooltip-content">Criar dependência técnica ou contratual</span></span> com a implantação do comodato de diluidores automáticos de químicos e dispensers para assegurar a exclusividade na recompra de refis em contratos de 12 a 24 meses.</p>
+                    </div>
+                    <!-- Item 5 -->
+                    <div class="bg-white p-6 rounded-xl shadow hover:-translate-y-1 transition-transform border-t-4 border-secondary group lg:col-span-2">
+                        <div class="w-10 h-10 bg-secondary text-white rounded-full flex items-center justify-center font-bold text-xl mb-4 group-hover:scale-110 transition-transform">5</div>
+                        <p class="text-gray-700 text-sm">Criar kits de entrada por segmento, com compromisso de disponibilidade e entrega no mesmo dia para itens, regiões e horários previamente definidos.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sessão 04: Tamanho de Mercado (Funil) -->
+    <section class="py-24 bg-primary text-white relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 32px 32px;"></div>
+        <div class="container mx-auto px-6 relative z-10">
+            <h2 class="text-4xl font-bold mb-16 text-center reveal">Definição do Tamanho de Mercado</h2>
+            
+            <div class="max-w-4xl mx-auto flex flex-col items-center gap-4 reveal">
+                
+                <!-- TAM -->
+                <div class="w-full relative group">
+                    <div class="funnel-layer bg-[#3F46A6] w-full p-8 text-center shadow-lg relative">
+                        <h3 class="text-3xl font-extrabold text-secondary mb-2">TAM <span class="text-xl font-normal text-white">| Mercado Total Endereçável Estimativa</span></h3>
+                        <p class="text-4xl font-bold mb-4">R$ 38,55 bilhões / ano</p>
+                        <p class="text-sm text-gray-200">Contexto Brasil: O mercado corporativo abrange os segmentos de saneantes químicos profissionais (R$ 10,53 bi), papéis sanitários institucionais (R$ 4,50 bi) e embalagens descartáveis para o canal alimentar e industrial (R$ 23,52 bi) no Brasil.</p>
+                    </div>
+                </div>
+
+                <!-- SAM -->
+                <div class="w-[85%] relative group mt-[-10px]">
+                    <div class="funnel-layer bg-[#555CC6] w-full p-8 text-center shadow-lg relative">
+                        <h3 class="text-2xl font-extrabold text-secondary mb-2">SAM <span class="text-lg font-normal text-white">| Mercado Disponível e Atendível Estimativa</span></h3>
+                        <p class="text-3xl font-bold mb-4">R$ 115,9 mi a R$ 580,15 mi / ano</p>
+                        <p class="text-sm text-gray-200">Fatores considerados: Foco na região do Centro-Oeste Paulista (compreendendo Botucatu e os polos de expansão como Bauru, Jaú, Lençóis Paulista e Avaré). Empresas e estabelecimentos nos segmentos de alimentação (food service), indústrias, saúde, hospedagem, educação e serviços corporativos.</p>
+                    </div>
+                </div>
+
+                <!-- SOM -->
+                <div class="w-[70%] relative group mt-[-10px]">
+                    <div class="funnel-layer bg-secondary w-full p-8 text-center shadow-lg relative">
+                        <h3 class="text-xl font-extrabold text-primary mb-2">SOM <span class="text-base font-normal text-white">| Mercado Alcançável e Obtível Estimativa</span></h3>
+                        <p class="text-2xl font-bold mb-4">R$ 9,0 mi a R$ 17,4 mi / ano</p>
+                        <p class="text-sm text-gray-100">Fatores considerados: Participação de mercado alvo de 1,55% a 3,00% no SAM regional (meta de faturamento de R$ 750 mil a R$ 1,45 milhão por mês em 18 a 36 meses).</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Sessão 05: SWOT Cruzada -->
+    <section class="py-24 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold text-primary mb-12 text-center reveal">SWOT CRUZADA</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 reveal">
+                
+                <!-- Força + Oportunidade -->
+                <div class="bg-green-50 rounded-2xl p-8 border border-green-200 hover:shadow-xl hover:-translate-y-1 transition-all">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="bg-green-500 text-white p-2 rounded-lg"><i class="fas fa-bolt"></i></div>
+                        <h3 class="font-bold text-xl text-green-800">Força + Oportunidade (atacar)</h3>
+                    </div>
+                    <p class="text-gray-700 italic">"Posicionar a oferta “Abastecimento Que Não Para”, usando o estoque local de R$ 700 mil e a frota própria como diferenciais."</p>
+                </div>
+
+                <!-- Força + Ameaça -->
+                <div class="bg-yellow-50 rounded-2xl p-8 border border-yellow-200 hover:shadow-xl hover:-translate-y-1 transition-all">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="bg-yellow-500 text-white p-2 rounded-lg"><i class="fas fa-shield-alt"></i></div>
+                        <h3 class="font-bold text-xl text-yellow-800">Força + Ameaça (defender)</h3>
+                    </div>
+                    <p class="text-gray-700">Combinar atendimento consultivo, comodato de equipamentos e agilidade de entrega para proteger a carteira. Demonstrar economia de consumo, redução de desperdício e segurança de reposição, deslocando a comparação do preço unitário para o custo total de abastecimento.</p>
+                </div>
+
+                <!-- Fraqueza + Oportunidade -->
+                <div class="bg-blue-50 rounded-2xl p-8 border border-blue-200 hover:shadow-xl hover:-translate-y-1 transition-all">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="bg-blue-500 text-white p-2 rounded-lg"><i class="fas fa-chart-line"></i></div>
+                        <h3 class="font-bold text-xl text-blue-800">Fraqueza + Oportunidade (desenvolver)</h3>
+                    </div>
+                    <p class="text-gray-700">Agilizar a cotação com kits pré-configurados, preços e disponibilidade acessíveis ao comercial para acelerar as cotações.</p>
+                </div>
+
+                <!-- Fraqueza + Ameaça -->
+                <div class="bg-red-50 rounded-2xl p-8 border border-red-200 hover:shadow-xl hover:-translate-y-1 transition-all">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="bg-red-500 text-white p-2 rounded-lg"><i class="fas fa-lock"></i></div>
+                        <h3 class="font-bold text-xl text-red-800">Fraqueza + Ameaça (proteger)</h3>
+                    </div>
+                    <p class="text-gray-700">Implantar Inside Sales B2B integrado ao CRM, com acompanhamento de propostas e alertas de necessidade do cliente recomprar reduzindo a dependência exclusiva dos vendedores de rua.</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Sessão 06: Jobs To Be Done -->
+    <section class="py-24 bg-gray-900 text-white">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold text-secondary mb-16 text-center reveal">Jobs To Be Done</h2>
+            
+            <div class="flex flex-col gap-8 max-w-4xl mx-auto">
+                <!-- Situação -->
+                <div class="bg-gray-800 p-8 rounded-2xl relative reveal reveal-left border-l-4 border-gray-500">
+                    <i class="fas fa-quote-left text-4xl text-gray-600 absolute top-4 right-6 opacity-30"></i>
+                    <h4 class="text-gray-400 uppercase tracking-widest text-sm mb-3">Situação</h4>
+                    <p class="text-xl font-light italic leading-relaxed">"Quando preciso garantir o suprimento e o abastecimento contínuo de materiais de higiene, limpeza e descartáveis para manter a operação do meu estabelecimento funcionando sem interrupções..."</p>
+                </div>
+
+                <!-- Resultado Desejado -->
+                <div class="bg-gray-800 p-8 rounded-2xl relative reveal reveal-right border-l-4 border-green-500 ml-0 md:ml-12">
+                    <i class="fas fa-bullseye text-4xl text-gray-600 absolute top-4 right-6 opacity-30"></i>
+                    <h4 class="text-green-400 uppercase tracking-widest text-sm mb-3">Resultado Desejado</h4>
+                    <p class="text-xl font-light italic leading-relaxed">"..eu quero um parceiro distribuidor local confiável, que garanta cotação ágil no mesmo dia, entrega rápida com frota própria e disponibilidade contínua dos produtos essenciais para a minha rotina..."</p>
+                </div>
+
+                <!-- Restrição -->
+                <div class="bg-gray-800 p-8 rounded-2xl relative reveal reveal-left border-l-4 border-red-500 ml-0 md:ml-24">
+                    <i class="fas fa-exclamation-triangle text-4xl text-gray-600 absolute top-4 right-6 opacity-30"></i>
+                    <h4 class="text-red-400 uppercase tracking-widest text-sm mb-3">Restrição</h4>
+                    <p class="text-xl font-light italic leading-relaxed">"...mas fico receoso com a lentidão na emissão de orçamentos, atrasos na entrega e rupturas de estoque que deixem minha empresa desabastecida, ou de ficar refém de fornecedores de fora que só passam uma vez por mês."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sessão 07: Concorrentes (Tabela Arrastável) -->
+    <section class="py-24 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold text-primary mb-4 text-center reveal">Análise de presença digital dos concorrentes</h2>
+            <p class="text-center text-gray-500 mb-12 reveal"><i class="fas fa-arrows-alt-h text-secondary"></i> Arraste a tabela para os lados para visualizar todos os dados.</p>
+            
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden reveal">
+                <!-- Wrapper for drag -->
+                <div class="overflow-x-auto draggable-container select-none p-4" id="draggable-table">
+                    <table class="w-full min-w-[800px] text-left border-collapse">
+                        <thead>
+                            <tr class="bg-primary text-white">
+                                <th class="p-4 rounded-tl-lg whitespace-nowrap">Concorrente</th>
+                                <th class="p-4 whitespace-nowrap">Acessos Site</th>
+                                <th class="p-4 whitespace-nowrap">Instagram Seguidores</th>
+                                <th class="p-4 whitespace-nowrap">Google Ads</th>
+                                <th class="p-4 whitespace-nowrap">Meta Ads</th>
+                                <th class="p-4 rounded-tr-lg whitespace-nowrap">Posicionamento</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-gray-700 divide-y divide-gray-200">
+                            <tr class="hover:bg-gray-50 transition-colors bg-blue-50/50">
+                                <td class="p-4 font-bold text-primary">Botupapel</td>
+                                <td class="p-4">408</td>
+                                <td class="p-4">1.810</td>
+                                <td class="p-4">0</td>
+                                <td class="p-4">0</td>
+                                <td class="p-4">Site com boa proposta de valor</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="p-4 font-semibold">EBEG EMBALAGENS</td>
+                                <td class="p-4">-</td>
+                                <td class="p-4">12.600</td>
+                                <td class="p-4">-</td>
+                                <td class="p-4 text-secondary font-bold">9</td>
+                                <td class="p-4">Bom social media</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="p-4 font-semibold">Embalimp</td>
+                                <td class="p-4">2.800</td>
+                                <td class="p-4">2.881</td>
+                                <td class="p-4">0</td>
+                                <td class="p-4">0</td>
+                                <td class="p-4">Bom social media</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="p-4 font-semibold">CACOLA OFICIAL</td>
+                                <td class="p-4 font-bold">13.600</td>
+                                <td class="p-4 font-bold">18.200</td>
+                                <td class="p-4 text-secondary font-bold">7</td>
+                                <td class="p-4 text-secondary font-bold">11</td>
+                                <td class="p-4">Oferta focada em equipamentos</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="p-4 font-semibold">Homero Embalagens Botucatu</td>
+                                <td class="p-4">0</td>
+                                <td class="p-4">0</td>
+                                <td class="p-4">0</td>
+                                <td class="p-4">0</td>
+                                <td class="p-4">Sem posicionamento</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="p-4 font-semibold">BR SUPPLY</td>
+                                <td class="p-4 font-bold text-primary">51.700</td>
+                                <td class="p-4">-</td>
+                                <td class="p-4 text-secondary font-bold">15</td>
+                                <td class="p-4">-</td>
+                                <td class="p-4"></td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="p-4 font-semibold">Higiclear</td>
+                                <td class="p-4 font-bold">21.700</td>
+                                <td class="p-4">1.297</td>
+                                <td class="p-4 text-secondary font-bold">18</td>
+                                <td class="p-4">0</td>
+                                <td class="p-4"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sessão 08: Comparação com o Mercado -->
+    <section class="py-24 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold text-primary mb-12 text-center reveal">Comparação com o Mercado</h2>
+            
+            <!-- Tabela Comparativa em Grid (Cards para melhor UI em vez de tabela crua) -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-20 reveal">
+                
+                <!-- BR Supply -->
+                <div class="bg-gray-50 rounded-xl p-6 border border-gray-200 hover:shadow-lg transition-all hover:-translate-y-1">
+                    <h3 class="text-xl font-bold text-center mb-6 pb-4 border-b">BR Supply</h3>
+                    <div class="space-y-4 text-sm">
+                        <div><strong class="text-primary block mb-1">Proposta de Valor:</strong> Plataforma digital que assume toda a gestão de suprimentos corporativos e reduz o custo operacional de compras indiretas.</div>
+                        <div><strong class="text-primary block mb-1">Público-Alvo:</strong> Grandes empresas, multinacionais, redes bancárias, redes de saúde, grandes indústrias e órgãos públicos.</div>
+                        <div><strong class="text-primary block mb-1">Diferenciação:</strong> Software próprio de compras conectado direto no ERP do cliente como SAP e TOTVS, além de relatórios automáticos de consumo.</div>
+                        <div><strong class="text-primary block mb-1">Segmentação:</strong> Foco em grandes contas corporativas divididas por setor de atuação, com equipe de atendimento dedicada.</div>
+                    </div>
+                </div>
+
+                <!-- Botu Papel (Highlight) -->
+                <div class="bg-blue-50 rounded-xl p-6 border-2 border-primary shadow-xl transform scale-105 z-10 relative">
+                    <h3 class="text-xl font-bold text-center mb-6 pb-4 border-b text-primary">Botu Papel</h3>
+                    <div class="space-y-4 text-sm">
+                        <div><strong class="text-primary block mb-1">Proposta de Valor:</strong> Compra local rápida de embalagens, higiene e limpeza com orçamento simples e entrega no mesmo dia.</div>
+                        <div><strong class="text-primary block mb-1">Público-Alvo:</strong> Pequenos e médios negócios, comércios de rua, clínicas, escritórios e restaurantes de Botucatu e cidades vizinhas.</div>
+                        <div><strong class="text-primary block mb-1">Diferenciação:</strong> Mais de 45 anos de atuação na cidade, atendimento direto pelo WhatsApp e frota própria para entrega ágil no contraturno.</div>
+                        <div><strong class="text-primary block mb-1">Segmentação:</strong> Foco geográfico regional em Botucatu e entorno, organizando a oferta por tipo de produto.</div>
+                    </div>
+                </div>
+
+                <!-- Higiclear -->
+                <div class="bg-gray-50 rounded-xl p-6 border border-gray-200 hover:shadow-lg transition-all hover:-translate-y-1">
+                    <h3 class="text-xl font-bold text-center mb-6 pb-4 border-b">Higiclear</h3>
+                    <div class="space-y-4 text-sm">
+                        <div><strong class="text-primary block mb-1">Proposta de Valor:</strong> Limpeza profissional e higienização técnica voltadas para eficiência e controle sanitário.</div>
+                        <div><strong class="text-primary block mb-1">Público-Alvo:</strong> Operações com exigência sanitária rigorosa, como hospitais, fábricas de alimentos, escolas, hotéis e empresas de terceirização.</div>
+                        <div><strong class="text-primary block mb-1">Diferenciação:</strong> Consultoria técnica no local, marcas globais no catálogo e instalação de dosadores automáticos de produto sem custo inicial.</div>
+                        <div><strong class="text-primary block mb-1">Segmentação:</strong> Organizada pelas regras e protocolos de higiene específicos de cada setor.</div>
+                    </div>
+                </div>
+
+                <!-- EBEG e Embalimp -->
+                <div class="bg-gray-50 rounded-xl p-6 border border-gray-200 hover:shadow-lg transition-all hover:-translate-y-1">
+                    <h3 class="text-xl font-bold text-center mb-6 pb-4 border-b">EBEG e Embalimp</h3>
+                    <div class="space-y-4 text-sm">
+                        <div><strong class="text-primary block mb-1">Proposta de Valor:</strong> Fornecimento em grande escala para aumentar a margem do cliente e melhorar a exposição no balcão.</div>
+                        <div><strong class="text-primary block mb-1">Público-Alvo:</strong> Supermercados, açougues, hortifrútis, padarias e operações de alimentação.</div>
+                        <div><strong class="text-primary block mb-1">Diferenciação:</strong> Marcas próprias exclusivas no catálogo, forte divulgação em redes sociais e alto poder de volume.</div>
+                        <div><strong class="text-primary block mb-1">Segmentação:</strong> Baseada na aplicação prática do item na rotina comercial.</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Argumentação de Valor (Galeria) -->
+            <div class="reveal">
+                <h3 class="text-3xl font-bold text-center mb-8 text-secondary">Argumentação de valor</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="overflow-hidden rounded-lg shadow cursor-pointer group" onclick="openLightbox('https://i.imgur.com/NqlACQz.png')">
+                        <img src="https://i.imgur.com/NqlACQz.png" alt="Argumentação 1" class="w-full h-48 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                    <div class="overflow-hidden rounded-lg shadow cursor-pointer group" onclick="openLightbox('https://i.imgur.com/55GR8C4.png')">
+                        <img src="https://i.imgur.com/55GR8C4.png" alt="Argumentação 2" class="w-full h-48 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                    <div class="overflow-hidden rounded-lg shadow cursor-pointer group" onclick="openLightbox('https://i.imgur.com/OslUAaN.png')">
+                        <img src="https://i.imgur.com/OslUAaN.png" alt="Argumentação 3" class="w-full h-48 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                    <div class="overflow-hidden rounded-lg shadow cursor-pointer group" onclick="openLightbox('https://i.imgur.com/nZlOx2Q.png')">
+                        <img src="https://i.imgur.com/nZlOx2Q.png" alt="Argumentação 4" class="w-full h-48 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sessão 09: Recomendações estratégicas -->
+    <section class="py-24 bg-light overflow-hidden relative">
+        <!-- Decoration -->
+        <div class="absolute right-0 top-0 w-1/3 h-full bg-primary opacity-5 transform skew-x-12"></div>
+
+        <div class="container mx-auto px-6 relative z-10">
+            <h2 class="text-4xl font-bold text-primary mb-12 text-center reveal">Recomendações estratégicas</h2>
+            
+            <div class="bg-secondary text-white p-6 rounded-xl shadow-lg mb-12 inline-block mx-auto reveal">
+                <p class="font-bold flex items-center gap-2"><i class="fas fa-exclamation-circle"></i> Análise de transações via planilha ou Dashboard para definir o plano de guerra comercial da semana.</p>
+            </div>
+
+            <!-- Imagem Recomendação movida para cima -->
+            <div class="flex justify-center reveal mb-16">
+                <div class="rounded-xl overflow-hidden shadow-2xl cursor-pointer group w-full max-w-4xl border-4 border-white" onclick="openLightbox('https://i.imgur.com/IQdtFnx.png')">
+                    <img src="https://i.imgur.com/IQdtFnx.png" alt="Dashboard Exemplo" class="w-full h-auto transform group-hover:scale-105 transition-transform duration-700">
+                    <div class="bg-primary text-white text-center py-2 text-sm">Clique para ampliar o modelo</div>
+                </div>
+            </div>
+
+            <!-- Linha do Tempo / Lista de Ações -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16 relative">
+                
+                <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-primary hover:-translate-y-1 transition-transform reveal reveal-left">
+                    <span class="text-secondary font-black text-2xl mb-2 block">01</span>
+                    <p class="text-sm text-gray-700">Monte uma política comercial de recompra por carteira. Em vez de esperar o cliente sumir por 2 a 3 meses, defina gatilhos por categoria: por exemplo, clientes que compram papel, luvas ou saneantes devem receber contato antes do ciclo médio acabar. Mesmo que o ERP não entregue isso sozinho, é possível começar com uma planilha mestre por segmento e periodicidade.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-primary hover:-translate-y-1 transition-transform reveal reveal-right">
+                    <span class="text-secondary font-black text-2xl mb-2 block">02</span>
+                    <p class="text-sm text-gray-700">Crie roteiros diferentes para atendimento por perfil de cliente. Exemplo: restaurantes e lanchonetes recebem abordagem focada em reposição e giro; indústrias e clubes recebem abordagem focada em volume, frequência e contrato informal de abastecimento. Hoje o catálogo é amplo demais para uma abordagem única funcionar bem.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-primary hover:-translate-y-1 transition-transform reveal reveal-left">
+                    <span class="text-secondary font-black text-2xl mb-2 block">03</span>
+                    <p class="text-sm text-gray-700">Estruture o uso da IA como processo. Em vez de análise manual solta aos sábados, defina critérios fixos de risco de churn: queda de 30% no volume, 45 dias sem compra para grupo A, 60 dias para grupo B, e assim por diante. Isso transforma a IA em rotina operacional replicável.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-primary hover:-translate-y-1 transition-transform reveal reveal-right">
+                    <span class="text-secondary font-black text-2xl mb-2 block">04</span>
+                    <p class="text-sm text-gray-700">Defina um painel semanal de indicadores operacionais simples, com no máximo 10 métricas: base ativa, novos clientes do mês, clientes perdidos, churn mensal, clientes reativados, faturamento por carteira, ticket médio, frequência média de recompra, tempo médio sem comprar e conversão de orçamento. O importante é cadência e consistência, não complexidade.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-primary hover:-translate-y-1 transition-transform reveal reveal-left">
+                    <span class="text-secondary font-black text-2xl mb-2 block">05</span>
+                    <p class="text-sm text-gray-700">Crie uma classificação ABC da base por receita e recorrência. Separe clientes em grupos como A, B e C e acompanhe churn e reativação por grupo. Isso evita tratar igualmente clientes muito diferentes e ajuda a concentrar energia onde a perda dói mais financeiramente.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-primary hover:-translate-y-1 transition-transform reveal reveal-right">
+                    <span class="text-secondary font-black text-2xl mb-2 block">06</span>
+                    <p class="text-sm text-gray-700">Implemente um motivo padronizado de perda e inatividade dentro do processo comercial. Sempre que um cliente parar de comprar ou rejeitar orçamento, o vendedor deve registrar uma causa simples: preço, concorrência, falta de estoque, atraso, relacionamento, sazonalidade, fechamento da empresa ou sem resposta. Em 60 a 90 dias isso já gera inteligência prática.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-primary hover:-translate-y-1 transition-transform reveal reveal-left">
+                    <span class="text-secondary font-black text-2xl mb-2 block">07</span>
+                    <p class="text-sm text-gray-700">Rode uma pesquisa de satisfação curta com clientes ativos e recém-inativos usando WhatsApp ou Google Forms. Três perguntas já bastam no início: nota de atendimento, principal dificuldade e chance de comprar novamente. O objetivo é criar aprendizado operacional rápido, não um NPS sofisticado de grande empresa.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-primary hover:-translate-y-1 transition-transform reveal reveal-right">
+                    <span class="text-secondary font-black text-2xl mb-2 block">08</span>
+                    <p class="text-sm text-gray-700">Monte um dashboard de recompra por categoria e janela esperada. Exemplo: papel toalha pode ter ciclo médio diferente de luvas, potes ou saneantes. Quando a empresa mede recorrência por categoria, consegue agir antes do churn e não depois que o cliente já desapareceu.</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Sessão 12: Definição de como comunicar -->
+    <section class="py-24 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold text-primary mb-16 text-center reveal">Definição de como comunicar o posicionamento</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 reveal">
+                
+                <!-- Card 1 -->
+                <div class="p-8 bg-gray-50 rounded-2xl border border-gray-100 hover:shadow-2xl hover:-translate-y-2 transition-all group text-center flex flex-col items-center">
+                    <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-primary transition-all">
+                        <i class="fas fa-truck-fast text-3xl text-primary group-hover:text-white transition-colors"></i>
+                    </div>
+                    <p class="text-gray-800 text-sm font-medium">Garantia de Disponibilidade e Logística Própria: A oferta utiliza a infraestrutura de R$ 700 mil em estoque local e a frota própria de entregas como argumento central que nunca fique desabastecido.</p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="p-8 bg-gray-50 rounded-2xl border border-gray-100 hover:shadow-2xl hover:-translate-y-2 transition-all group text-center flex flex-col items-center">
+                    <div class="w-20 h-20 bg-secondary/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-secondary transition-all">
+                        <i class="fas fa-bolt text-3xl text-secondary group-hover:text-white transition-colors"></i>
+                    </div>
+                    <p class="text-gray-800 text-sm font-medium">Velocidade na Cotação e Atendimento Ágil</p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="p-8 bg-gray-50 rounded-2xl border border-gray-100 hover:shadow-2xl hover:-translate-y-2 transition-all group text-center flex flex-col items-center">
+                    <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-primary transition-all">
+                        <i class="fas fa-handshake text-3xl text-primary group-hover:text-white transition-colors"></i>
+                    </div>
+                    <p class="text-gray-800 text-sm font-medium">Comodato de Equipamentos (Trava de <span class="tooltip-trigger">Lock-in<span class="tooltip-content">Fidelização contratual</span></span>)</p>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="p-8 bg-gray-50 rounded-2xl border border-gray-100 hover:shadow-2xl hover:-translate-y-2 transition-all group text-center flex flex-col items-center">
+                    <div class="w-20 h-20 bg-secondary/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-secondary transition-all">
+                        <i class="fas fa-boxes-stacked text-3xl text-secondary group-hover:text-white transition-colors"></i>
+                    </div>
+                    <p class="text-gray-800 text-sm font-medium">Kits e Combos por segmento (como o "Kit Padaria", "Kit Restaurante" ou "Kit Higiene Industrial")</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Sessão 13: Resumo e Próximos Passos -->
+    <section class="py-20 bg-gray-100">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
+                
+                <!-- O que aconteceu -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg border-t-8 border-primary reveal reveal-left">
+                    <h3 class="text-2xl font-bold text-primary mb-6 flex items-center gap-2"><i class="fas fa-check-circle"></i> O QUE ACONTECEU ESSA SEMANA</h3>
+                    <ul class="space-y-4">
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-angle-right text-secondary mt-1"></i>
+                            <span class="text-gray-700">Entendemos de forma mais aprofundada o seu mercado, concorrentes e o seu público.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-angle-right text-secondary mt-1"></i>
+                            <span class="text-gray-700">Comparamos a sua solução com a de seus concorrentes, conseguindo uma visão clara de como cada player está no mercado.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Próximos Passos -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg border-t-8 border-secondary reveal reveal-right">
+                    <h3 class="text-2xl font-bold text-primary mb-6 flex items-center gap-2"><i class="fas fa-forward"></i> PRÓXIMOS PASSOS</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-center gap-3"><i class="fas fa-arrow-right text-secondary text-sm"></i> <span class="text-gray-700">Revisão das campanhas</span></li>
+                        <li class="flex items-center gap-3"><i class="fas fa-arrow-right text-secondary text-sm"></i> <span class="text-gray-700">Revisão das ferramentas</span></li>
+                        <li class="flex items-center gap-3"><i class="fas fa-arrow-right text-secondary text-sm"></i> <span class="text-gray-700">Análise dos seus criativos de redes</span></li>
+                        <li class="flex items-center gap-3"><i class="fas fa-arrow-right text-secondary text-sm"></i> <span class="text-gray-700">Análise dos seus concorrentes</span></li>
+                        <li class="flex items-center gap-3"><i class="fas fa-arrow-right text-secondary text-sm"></i> <span class="text-gray-700">Estudo de performance</span></li>
+                        <li class="flex items-center gap-3"><i class="fas fa-arrow-right text-secondary text-sm"></i> <span class="text-gray-700">Diagnóstico de Copy</span></li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Rodapé -->
+    <footer class="bg-v4red py-12 text-white">
+        <div class="container mx-auto px-6 flex flex-col items-center justify-center gap-6">
+            <div class="text-center">
+                <p class="text-sm font-medium opacity-90 uppercase tracking-widest mb-2">Produzido por:</p>
+                <img src="https://i.imgur.com/SU08Zb0.png" alt="V4 Silva Anchieta & Co." class="h-12 mx-auto object-contain filter brightness-0 invert">
+            </div>
+        </div>
+    </footer>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="fixed inset-0 z-[100] bg-black/90 hidden flex items-center justify-center opacity-0 transition-opacity duration-300">
+        <button onclick="closeLightbox()" class="absolute top-6 right-6 text-white hover:text-secondary text-4xl focus:outline-none z-[101]">&times;</button>
+        <img id="lightbox-img" src="" alt="Ampliada" class="max-w-[90%] max-h-[90vh] object-contain rounded-lg shadow-2xl transform scale-95 transition-transform duration-300">
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // 1. Sticky Header with Glassmorphism
+        const header = document.getElementById('main-header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.remove('py-4');
+                header.classList.add('py-2');
+            } else {
+                header.classList.add('py-4');
+                header.classList.remove('py-2');
+            }
+        });
+
+        // 2. Scroll Reveal Animation (Intersection Observer)
+        const revealElements = document.querySelectorAll('.reveal');
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target); // Anima só uma vez
+                }
+            });
+        }, {
+            root: null,
+            threshold: 0.15,
+            rootMargin: "0px 0px -50px 0px"
+        });
+
+        revealElements.forEach(el => revealObserver.observe(el));
+
+        // 3. Lightbox Functionality
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+
+        function openLightbox(imageSrc) {
+            lightboxImg.src = imageSrc;
+            lightbox.classList.remove('hidden');
+            // Pequeno delay para a animação CSS de opacidade rodar
+            setTimeout(() => {
+                lightbox.classList.remove('opacity-0');
+                lightboxImg.classList.remove('scale-95');
+                lightboxImg.classList.add('scale-100');
+            }, 10);
+            document.body.style.overflow = 'hidden'; // Impede rolagem da página
+        }
+
+        function closeLightbox() {
+            lightbox.classList.add('opacity-0');
+            lightboxImg.classList.remove('scale-100');
+            lightboxImg.classList.add('scale-95');
+            setTimeout(() => {
+                lightbox.classList.add('hidden');
+                lightboxImg.src = '';
+            }, 300);
+            document.body.style.overflow = 'auto'; // Restaura rolagem
+        }
+
+        // Fechar lightbox clicando fora da imagem
+        lightbox.addEventListener('click', (e) => {
+            if(e.target === lightbox) {
+                closeLightbox();
+            }
+        });
+        
+        // Fechar lightbox com a tecla ESC
+        document.addEventListener('keydown', (e) => {
+            if(e.key === 'Escape' && !lightbox.classList.contains('hidden')) {
+                closeLightbox();
+            }
+        });
+
+        // 4. Line Clamp Toggle (Ver mais)
+        function toggleText(id, btn) {
+            const el = document.getElementById(id);
+            if (el.classList.contains('line-clamp-content')) {
+                if (el.classList.contains('expanded')) {
+                    el.classList.remove('expanded');
+                    btn.innerText = "Ver mais";
+                } else {
+                    el.classList.add('expanded');
+                    btn.innerText = "Ver menos";
+                }
+            }
+        }
+
+        // 5. Draggable Table Logic
+        const slider = document.getElementById('draggable-table');
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        slider.addEventListener('mousedown', (e) => {
+            isDown = true;
+            slider.classList.add('active');
+            startX = e.pageX - slider.offsetLeft;
+            scrollLeft = slider.scrollLeft;
+        });
+        slider.addEventListener('mouseleave', () => {
+            isDown = false;
+            slider.classList.remove('active');
+        });
+        slider.addEventListener('mouseup', () => {
+            isDown = false;
+            slider.classList.remove('active');
+        });
+        slider.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - slider.offsetLeft;
+            const walk = (x - startX) * 2; // Velocidade do arraste
+            slider.scrollLeft = scrollLeft - walk;
+        });
+
+    </script>
+</body>
+</html>
