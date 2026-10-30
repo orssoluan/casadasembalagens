@@ -1,1 +1,1352 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico de Marketing / Comercial - Casa Das Embalagens Botucatu</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            primary: '#2C328E',   /* Azul V4/Casa das Embalagens */
+                            secondary: '#FF7B1D', /* Laranja */
+                            tertiary: '#FFFFFF',  /* Branco */
+                            footer: '#E50914',    /* Vermelho V4 */
+                            dark: '#111827',
+                            light: '#F3F4F6',
+                            /* Cores originais do CRM Simulator para manter fidelidade visual lá dentro */
+                            crmPurple: '#36255D',
+                            crmGreen: '#00D982',
+                            crmDark: '#251940'
+                        }
+                    },
+                    backgroundImage: {
+                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --primary: #2C328E;
+            --secondary: #FF7B1D;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FAFAFA;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1B3859; 
+            border-radius: 5px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2C328E; 
+        }
+
+        /* Efeitos de UI/UX Premium */
+        
+        /* Text Gradient */
+        .text-gradient {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Shine Effect for CTAs */
+        .btn-shine {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-shine::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 20%;
+            height: 200%;
+            opacity: 0;
+            transform: rotate(30deg);
+            background: rgba(255, 255, 255, 0.3);
+            background: linear-gradient(
+                to right, 
+                rgba(255, 255, 255, 0.13) 0%,
+                rgba(255, 255, 255, 0.13) 77%,
+                rgba(255, 255, 255, 0.5) 92%,
+                rgba(255, 255, 255, 0.0) 100%
+            );
+        }
+        .btn-shine:hover::after {
+            opacity: 1;
+            left: 130%;
+            transition-property: left, top, opacity;
+            transition-duration: 0.7s, 0.7s, 0.15s;
+            transition-timing-function: ease-in-out;
+        }
+
+        /* Scroll Reveal Utility Classes */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reveal-left {
+            transform: translateX(-50px);
+        }
+        .reveal-right {
+            transform: translateX(50px);
+        }
+
+        /* Parallax Background */
+        .parallax-bg {
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        /* Slow Zoom for Hero Sections */
+        .slow-zoom-bg {
+            animation: slowZoom 20s ease-in-out infinite alternate;
+        }
+        @keyframes slowZoom {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
+
+        /* Blobs Dinâmicos */
+        .blob {
+            position: absolute;
+            filter: blur(80px);
+            z-index: 0;
+            opacity: 0.5;
+            animation: moveBlob 15s infinite alternate;
+        }
+        @keyframes moveBlob {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(50px, -50px) scale(1.1); }
+            100% { transform: translate(-50px, 50px) scale(0.9); }
+        }
+
+        /* Glassmorphism Classes */
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .glass-dark {
+            background: rgba(44, 50, 142, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Tooltip Elegant */
+        .has-tooltip {
+            position: relative;
+            cursor: help;
+            border-bottom: 1px dashed var(--secondary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .tooltip-text {
+            visibility: hidden;
+            width: max-content;
+            max-width: 250px;
+            background-color: var(--primary);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px 12px;
+            position: absolute;
+            z-index: 50;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            font-size: 0.75rem;
+            font-weight: normal;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: var(--primary) transparent transparent transparent;
+        }
+        .has-tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(-5px);
+        }
+
+        /* Lightbox Styles */
+        #lightbox {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+        }
+        #lightbox img {
+            max-width: 90%;
+            max-height: 90vh;
+            border-radius: 8px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s;
+        }
+        .lightbox-trigger {
+            cursor: zoom-in;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .lightbox-trigger:hover {
+            transform: scale(1.02);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        /* Estilos específicos para isolar o simulador CRM do resto da página */
+        .crm-simulator-wrapper {
+            background-color: #36255D;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            border-radius: 1rem;
+            overflow: hidden;
+            position: relative;
+            height: 80vh;
+            min-height: 600px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        /* Custom scrollbar para o simulador */
+        .crm-simulator-wrapper .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .crm-simulator-wrapper .custom-scrollbar::-webkit-scrollbar-track {
+            background: #251940; 
+            border-radius: 4px;
+        }
+        .crm-simulator-wrapper .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #4a357a; 
+            border-radius: 4px;
+        }
+        .crm-simulator-wrapper .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #00D982; 
+        }
+
+        /* Animações do CRM */
+        .crm-simulator-wrapper .lead-dot {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background-color: #00D982;
+            border-radius: 50%;
+            z-index: 50;
+            transition: all 0.5s linear;
+            box-shadow: 0 0 8px #00D982;
+        }
+        .crm-simulator-wrapper .crm-card {
+            background-color: white;
+            color: #36255D;
+            padding: 8px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 0.75rem;
+            border-left: 4px solid #00D982;
+            animation: fadeInCrm 0.5s ease-out;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            text-align: left;
+        }
+        .crm-simulator-wrapper .crm-card.moving {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 10;
+        }
+        .crm-simulator-wrapper .crm-card.sold {
+            background-color: #00D982;
+            color: #36255D;
+            border-left: 4px solid #FFFFFF;
+        }
+        @keyframes fadeInCrm {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-brand-secondary selection:text-white relative">
+
+    <!-- HEADER -->
+    <header id="main-header" class="fixed w-full top-0 z-40 transition-all duration-300 py-4 px-6 md:px-12 flex justify-between items-center bg-white/10 backdrop-blur-md border-b border-white/20">
+        <!-- V4 Logo (Esquerda em mobile, mas a regra pede centralizado. Ajustando layout para acomodar ambos elegantemente) -->
+        <div class="flex-1 flex justify-start">
+             <img src="https://imgur.com/oiekiyj.png" alt="Casa das Embalagens Logo" class="h-10 md:h-12 object-contain hover:scale-105 transition-transform origin-left">
+        </div>
+        
+        <!-- Placeholder Central para equilibrar se necessário, ou titulo oculto -->
+        <div class="hidden md:flex flex-1 justify-center text-sm font-semibold text-brand-primary opacity-50 tracking-widest uppercase">
+            
+        </div>
+
+        <!-- V4 Logo Direita -->
+        <div class="flex-1 flex justify-end">
+            <img src="https://brand.v4company.com/_next/image?url=%2Fimages%2Flogos%2Fsimbolo-company.webp&w=256&q=75" alt="V4 Company Logo" class="h-8 md:h-10 object-contain hover:scale-105 transition-transform origin-right brightness-0 invert">
+        </div>
+    </header>
+
+    <main>
+        <!-- SESSÃO 01: HERO SECTION -->
+        <section id="sessao-01" class="relative w-full h-screen min-h-[600px] flex items-center justify-center overflow-hidden bg-brand-primary">
+            <!-- Background Animado -->
+            <div class="absolute inset-0 z-0 overflow-hidden">
+                <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1556761175-5973dc0f32b7?auto=format&fit=crop&q=80')] opacity-10 bg-cover bg-center slow-zoom-bg mix-blend-overlay"></div>
+                <!-- Blobs -->
+                <div class="blob bg-brand-secondary w-96 h-96 rounded-full top-[-10%] left-[-10%]"></div>
+                <div class="blob bg-blue-400 w-80 h-80 rounded-full bottom-[-10%] right-[-10%]" style="animation-delay: -5s;"></div>
+            </div>
+
+            <!-- Conteúdo Central -->
+            <div class="relative z-10 text-center px-6 max-w-4xl reveal active">
+                
+                <h1 class="text-5xl md:text-7xl font-extrabold text-white leading-tight mb-6 tracking-tight">
+                    Diagnóstico de <br/>
+                    Marketing <span class="text-gradient">/ Comercial</span>
+                </h1>
+                
+                <a href="#sessao-02" class="btn-shine inline-flex items-center gap-2 bg-brand-secondary text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-orange-600 transition-all shadow-[0_10px_30px_-10px_rgba(255,123,29,0.6)] transform hover:-translate-y-1">
+                    Iniciar Apresentação <i class="fa-solid fa-arrow-down"></i>
+                </a>
+            </div>
+            
+            <!-- Indicador de Scroll -->
+            <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce z-10 text-white/50">
+                <i class="fa-solid fa-chevron-down text-2xl"></i>
+            </div>
+        </section>
+
+        <!-- SESSÃO 02: SUMÁRIO -->
+        <section id="sessao-02" class="py-24 bg-white relative">
+            <div class="max-w-6xl mx-auto px-6">
+                <div class="text-center mb-16 reveal">
+                    
+                    <h3 class="text-4xl font-extrabold text-brand-primary mb-4">SUMÁRIO</h3>
+                    <div class="inline-flex items-center gap-2 bg-gray-100 text-gray-600 px-4 py-2 rounded-full font-medium text-sm">
+                        <i class="fa-regular fa-clock"></i> Duração Estimada: 1h
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Card 1 -->
+                    <div class="bg-gray-50 rounded-2xl p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 reveal group">
+                        <div class="w-12 h-12 bg-brand-primary/10 text-brand-primary rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </div>
+                        <h4 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-brand-primary transition-colors">Benchmarking de Anúncios</h4>
+                        <p class="text-gray-600 text-sm leading-relaxed">- Análise estratégica de tráfego.</p>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="bg-gray-50 rounded-2xl p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 reveal reveal-left group" style="transition-delay: 100ms;">
+                        <div class="w-12 h-12 bg-brand-secondary/10 text-brand-secondary rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-pen-nib"></i>
+                        </div>
+                        <h4 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-brand-secondary transition-colors">Benchmarking de Conteúdos</h4>
+                        <p class="text-gray-600 text-sm leading-relaxed">- Estudo de criativos e narrativas.</p>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="bg-gray-50 rounded-2xl p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 reveal reveal-left group" style="transition-delay: 200ms;">
+                        <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+                            <i class="fa-brands fa-instagram"></i>
+                        </div>
+                        <h4 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">Benchmarking Social Media</h4>
+                        <p class="text-gray-600 text-sm leading-relaxed">- Posicionamento em redes sociais.</p>
+                    </div>
+
+                    <!-- Card 4 -->
+                    <div class="bg-gray-50 rounded-2xl p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 reveal reveal-left group" style="transition-delay: 300ms;">
+                        <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-laptop-code"></i>
+                        </div>
+                        <h4 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-purple-600 transition-colors">Benchmarking de Site & Concorrentes</h4>
+                        <p class="text-gray-600 text-sm leading-relaxed">- Análise de landing pages e mercado.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SESSÃO 03: MÍDIA PAGA -->
+        <section id="sessao-03" class="py-24 bg-brand-light relative">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="mb-16 reveal">
+                    
+                    <h3 class="text-4xl font-extrabold text-brand-primary mb-6">Diagnóstico de mídia paga</h3>
+                    <div class="w-20 h-1 bg-brand-secondary rounded"></div>
+                </div>
+
+                <div class="mb-12 reveal">
+                    <h4 class="text-2xl font-bold text-gray-800 flex items-center gap-3 mb-6">
+                        <i class="fa-brands fa-google text-blue-500"></i> 1. Benchmark Google Ads
+                    </h4>
+                    
+                    <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 mb-10">
+                        <h5 class="text-lg font-bold text-brand-primary mb-4 border-b pb-2">1.1 PALAVRAS-CHAVE</h5>
+                        <p class="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wider">Palavras-Chave Principais:</p>
+                        <div class="flex flex-wrap gap-3 mb-8">
+                            <span class="bg-gray-100 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium border border-gray-200">fornecedor de produtos de limpeza</span>
+                            <span class="bg-gray-100 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium border border-gray-200">distribuidora de produtos de limpeza</span>
+                            <span class="bg-gray-100 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium border border-gray-200">distribuidora de descartaveis</span>
+                            <span class="bg-gray-100 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium border border-gray-200">produtos de limpeza atacado</span>
+                            <span class="bg-gray-100 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium border border-gray-200">distribuidora de material de limpeza</span>
+                        </div>
+
+                        <div class="p-6 bg-blue-50 text-blue-900 rounded-xl border-l-4 border-brand-primary text-base leading-relaxed">
+                            O cenário para a Casa das Embalagens Botucatu no Google Search representa uma oportunidade estratégica de alto impacto no <span class="has-tooltip">B2B<span class="tooltip-text">Business-to-Business: Comércio entre empresas.</span></span>. Como 90% do faturamento da empresa é concentrado em produtos de higiene, limpeza e saneantes corporativos, capturar a intenção ativa de empresas que buscam fornecedores e distribuidores é o caminho mais direto para atrair compradores recorrentes e acelerar o canal digital. A análise das palavras do Planejador de Palavras-chave revela volumes elevados de busca e leilões saudáveis para o segmento.
+                        </div>
+                    </div>
+
+                    <h5 class="text-2xl font-bold text-gray-800 mb-8 reveal">Análise das Palavras Escolhidas</h5>
+
+                    <!-- Data Grid for Keywords -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        
+                        <!-- KW 1 -->
+                        <div class="bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-shadow reveal group border-t-4 border-brand-primary">
+                            <h6 class="text-lg font-bold text-brand-primary mb-4 group-hover:text-brand-secondary transition-colors">1. fornecedor de produtos de limpeza</h6>
+                            
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div class="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                    <div class="text-xs text-gray-500 mb-1"><i class="fa-solid fa-magnifying-glass mr-1"></i> Volume</div>
+                                    <div class="font-bold text-gray-900">5.400 <span class="text-xs font-normal">buscas/mês</span></div>
+                                </div>
+                                <div class="bg-green-50 p-3 rounded-lg border border-green-100">
+                                    <div class="text-xs text-green-700 mb-1"><i class="fa-solid fa-arrow-trend-up mr-1"></i> Tendência</div>
+                                    <div class="font-bold text-green-800">+86% <span class="text-xs font-normal">em 3 meses (-45% YoY)</span></div>
+                                </div>
+                                <div class="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                    <div class="text-xs text-gray-500 mb-1"><i class="fa-solid fa-users mr-1"></i> Concorrência</div>
+                                    <div class="font-bold text-green-600">Baixa</div>
+                                </div>
+                                <div class="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                    <div class="text-xs text-gray-500 mb-1"><i class="fa-solid fa-coins mr-1"></i> <span class="has-tooltip">CPC<span class="tooltip-text">Custo Por Clique: Valor pago por cada visita gerada pelo anúncio.</span></span></div>
+                                    <div class="font-bold text-gray-900">R$ 1,42 <span class="text-xs text-gray-500 font-normal">a R$ 4,72</span></div>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <span class="inline-block text-xs font-bold text-brand-secondary uppercase mb-1">Estratégia:</span>
+                                <p class="text-sm text-gray-600 leading-relaxed">Deve ser o termo prioritário para atração de demanda qualificada B2B. Apresenta altíssima procura e concorrência baixa, permitindo capturar compradores corporativos (restaurantes, padarias, indústrias, clínicas e escritórios) a um custo por clique bastante competitivo. Deve rodar com segmentação geográfica restrita a Botucatu e região atendida.</p>
+                            </div>
+                        </div>
+
+                        <!-- KW 2 -->
+                        <div class="bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-shadow reveal group border-t-4 border-brand-secondary">
+                            <h6 class="text-lg font-bold text-brand-primary mb-1 group-hover:text-brand-secondary transition-colors">2. distribuidora de produtos de limpeza</h6>
+                            <span class="inline-block bg-orange-100 text-orange-800 text-[10px] font-bold px-2 py-1 rounded mb-4">(Fundo de Funil/ Alta Conversão)</span>
+                            
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div class="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                    <div class="text-xs text-gray-500 mb-1"><i class="fa-solid fa-magnifying-glass mr-1"></i> Volume</div>
+                                    <div class="font-bold text-gray-900">2.900 <span class="text-xs font-normal">buscas/mês</span></div>
+                                </div>
+                                <div class="bg-green-50 p-3 rounded-lg border border-green-100">
+                                    <div class="text-xs text-green-700 mb-1"><i class="fa-solid fa-arrow-trend-up mr-1"></i> Tendência</div>
+                                    <div class="font-bold text-green-800">+53% <span class="text-xs font-normal">em 3m (0% YoY)</span></div>
+                                </div>
+                                <div class="bg-yellow-50 p-3 rounded-lg border border-yellow-100">
+                                    <div class="text-xs text-yellow-700 mb-1"><i class="fa-solid fa-users mr-1"></i> Concorrência</div>
+                                    <div class="font-bold text-yellow-600">Média</div>
+                                </div>
+                                <div class="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                    <div class="text-xs text-gray-500 mb-1"><i class="fa-solid fa-coins mr-1"></i> CPC</div>
+                                    <div class="font-bold text-gray-900">R$ 1,42 <span class="text-xs text-gray-500 font-normal">a R$ 4,60</span></div>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <span class="inline-block text-xs font-bold text-brand-secondary uppercase mb-1">Estratégia:</span>
+                                <p class="text-sm text-gray-600 leading-relaxed line-clamp-4 hover:line-clamp-none transition-all duration-500">Termo de fundo de funil exato para o modelo de distribuição da Casa das Embalagens. O usuário que pesquisa por "distribuidora" já decidiu comprar no atacado ou trocar de fornecedor. Os anúncios devem destacar a pronta-entrega, o estoque próprio de R$ 700 mil e a frota própria de entregas.</p>
+                            </div>
+                        </div>
+
+                        <!-- KW 3 -->
+                        <div class="bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-shadow reveal group border-t-4 border-blue-400">
+                            <h6 class="text-lg font-bold text-brand-primary mb-1 group-hover:text-blue-500 transition-colors">3. distribuidora de descartaveis</h6>
+                            <span class="inline-block bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-1 rounded mb-4">(Expansão de Mix e Venda Cruzada)</span>
+                            
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div class="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                    <div class="text-xs text-gray-500 mb-1"><i class="fa-solid fa-magnifying-glass mr-1"></i> Volume</div>
+                                    <div class="font-bold text-gray-900">880 <span class="text-xs font-normal">buscas/mês</span></div>
+                                </div>
+                                <div class="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                    <div class="text-xs text-gray-500 mb-1"><i class="fa-solid fa-minus mr-1"></i> Tendência</div>
+                                    <div class="font-bold text-gray-700">Estável <span class="text-xs font-normal">(0% / -18% YoY)</span></div>
+                                </div>
+                                <div class="bg-red-50 p-3 rounded-lg border border-red-100">
+                                    <div class="text-xs text-red-700 mb-1"><i class="fa-solid fa-users mr-1"></i> Concorrência</div>
+                                    <div class="font-bold text-red-600">Alta</div>
+                                </div>
+                                <div class="bg-green-50 p-3 rounded-lg border border-green-100">
+                                    <div class="text-xs text-green-700 mb-1"><i class="fa-solid fa-coins mr-1"></i> CPC Acessível</div>
+                                    <div class="font-bold text-green-800">R$ 1,03 <span class="text-xs font-normal">a R$ 3,04</span></div>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <span class="inline-block text-xs font-bold text-brand-secondary uppercase mb-1">Estratégia:</span>
+                                <p class="text-sm text-gray-600 leading-relaxed">Captura estabelecimentos de Food Service (lanchonetes, restaurantes, padarias) que procuram copos, luvas, toucas e embalagens. Embora possua concorrência alta, o teto de CPC é acessível (R$ 3,04), servindo como porta de entrada ideal para ofertar a linha completa de saneantes e limpeza (<span class="has-tooltip">cross-sell<span class="tooltip-text">Tática de vender produtos complementares a um cliente existente.</span></span>).</p>
+                            </div>
+                        </div>
+
+                        <!-- KW 4 -->
+                        <div class="bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-shadow reveal group border-t-4 border-green-500">
+                            <h6 class="text-lg font-bold text-brand-primary mb-4 group-hover:text-green-600 transition-colors">4. produtos de limpeza atacado / atacado produtos de limpeza</h6>
+                            
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div class="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                    <div class="text-xs text-gray-500 mb-1"><i class="fa-solid fa-magnifying-glass mr-1"></i> Volume</div>
+                                    <div class="font-bold text-gray-900">880 <span class="text-xs font-normal">buscas/mês (cada)</span></div>
+                                </div>
+                                <div class="bg-green-50 p-3 rounded-lg border border-green-100">
+                                    <div class="text-xs text-green-700 mb-1"><i class="fa-solid fa-arrow-trend-up mr-1"></i> Tendência</div>
+                                    <div class="font-bold text-green-800">+22% <span class="text-xs font-normal">em 3m (-12% YoY)</span></div>
+                                </div>
+                                <div class="bg-red-50 p-3 rounded-lg border border-red-100">
+                                    <div class="text-xs text-red-700 mb-1"><i class="fa-solid fa-users mr-1"></i> Concorrência</div>
+                                    <div class="font-bold text-red-600">Alta</div>
+                                </div>
+                                <div class="bg-green-50 p-3 rounded-lg border border-green-100">
+                                    <div class="text-xs text-green-700 mb-1"><i class="fa-solid fa-coins mr-1"></i> Menor CPC</div>
+                                    <div class="font-bold text-green-800">R$ 0,85 <span class="text-xs font-normal">a R$ 3,11</span></div>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <span class="inline-block text-xs font-bold text-brand-secondary uppercase mb-1">Estratégia:</span>
+                                <p class="text-sm text-gray-600 leading-relaxed">Apresenta o menor custo de entrada da grade (lance mínimo de R$ 0,85). É excelente para atrair compradores focados em preço e volume, posicionando a Casa das Embalagens como alternativa conveniente ao deslocamento até atacadistas físicos, com benefício de entrega faturada.</p>
+                            </div>
+                        </div>
+
+                        <!-- KW 5 -->
+                        <div class="bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-shadow reveal group border-t-4 border-purple-500 md:col-span-2 max-w-3xl mx-auto w-full">
+                            <h6 class="text-lg font-bold text-brand-primary mb-4 group-hover:text-purple-600 transition-colors">5. distribuidora de material de limpeza / materiais de limpeza</h6>
+                            
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                                <div class="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                    <div class="text-xs text-gray-500 mb-1"><i class="fa-solid fa-magnifying-glass mr-1"></i> Volume</div>
+                                    <div class="font-bold text-gray-900">880 <span class="text-xs font-normal">buscas/mês (cada)</span></div>
+                                </div>
+                                <div class="bg-green-50 p-3 rounded-lg border border-green-100">
+                                    <div class="text-xs text-green-700 mb-1"><i class="fa-solid fa-arrow-trend-up mr-1"></i> Tendência</div>
+                                    <div class="font-bold text-green-800">+22% <span class="text-xs font-normal">em 3m (-32% YoY)</span></div>
+                                </div>
+                                <div class="bg-red-50 p-3 rounded-lg border border-red-100">
+                                    <div class="text-xs text-red-700 mb-1"><i class="fa-solid fa-users mr-1"></i> Concorrência</div>
+                                    <div class="font-bold text-red-600">Alta</div>
+                                </div>
+                                <div class="bg-red-50 p-3 rounded-lg border border-red-100">
+                                    <div class="text-xs text-red-700 mb-1"><i class="fa-solid fa-coins mr-1"></i> CPC Mais Alto</div>
+                                    <div class="font-bold text-red-800">R$ 1,68 <span class="text-xs font-normal">a R$ 5,49</span></div>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <span class="inline-block text-xs font-bold text-brand-secondary uppercase mb-1">Estratégia:</span>
+                                <p class="text-sm text-gray-600 leading-relaxed">Variação técnica utilizada por setores de compras de empresas médias/grandes, indústrias, condomínios e escolas. Por ter o teto de CPC mais elevado da grade (R$ 5,49), deve ser trabalhada em correspondência de frase qualificada, direcionando o tráfego para páginas com botão direto para solicitação de orçamento rápido em PDF no WhatsApp.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Divisor Parallax -->
+        <div class="h-64 w-full parallax-bg bg-[url('https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&q=80')] relative flex items-center justify-center border-y-4 border-brand-secondary">
+            <div class="absolute inset-0 bg-brand-primary opacity-80"></div>
+            <h3 class="relative z-10 text-white text-3xl md:text-5xl font-bold tracking-widest uppercase opacity-30">Social Media</h3>
+        </div>
+
+        <!-- SESSÃO 04: MÍDIAS SOCIAIS -->
+        <section id="sessao-04" class="py-24 bg-[#111827] text-white relative">
+            <!-- Blobs fundo escuro -->
+            <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+                <div class="blob bg-purple-600/20 w-96 h-96 rounded-full top-0 left-0"></div>
+                <div class="blob bg-brand-secondary/20 w-80 h-80 rounded-full bottom-0 right-0"></div>
+            </div>
+
+            <div class="max-w-6xl mx-auto px-6 relative z-10">
+                <div class="mb-16 reveal">
+                    
+                    <h3 class="text-4xl font-extrabold text-white mb-6">Diagnóstico de mídia sociais</h3>
+                    <div class="w-20 h-1 bg-brand-secondary rounded"></div>
+                </div>
+
+                <div class="reveal">
+                    <h4 class="text-2xl font-bold text-gray-200 flex items-center gap-3 mb-8">
+                        <i class="fa-brands fa-instagram text-brand-secondary"></i> 1. Benchmark
+                    </h4>
+                    
+                    <h5 class="text-xl font-semibold text-gray-300 border-b border-gray-700 pb-2 mb-8">1.1 Post de Manutenção</h5>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+                        
+                        <!-- Post Solução -->
+                        <div class="bg-gray-800/50 p-6 rounded-2xl border border-gray-700 hover:border-brand-secondary transition-colors group">
+                            <p class="text-sm text-gray-400 mb-4 uppercase tracking-wider font-semibold group-hover:text-white transition-colors">Post voltado em solução por mercado</p>
+                            <div class="relative overflow-hidden rounded-xl bg-black">
+                                <img src="https://imgur.com/Tcn1HsG.png" alt="Post Solução por Mercado" class="w-full h-auto object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500 lightbox-trigger">
+                                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                    <div class="bg-black/60 text-white px-4 py-2 rounded-full backdrop-blur-sm">
+                                        <i class="fa-solid fa-magnifying-glass-plus mr-2"></i> Clique para ampliar
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Post Logistico -->
+                        <div class="bg-gray-800/50 p-6 rounded-2xl border border-gray-700 hover:border-brand-secondary transition-colors group">
+                            <p class="text-sm text-gray-400 mb-4 uppercase tracking-wider font-semibold group-hover:text-white transition-colors">Post fixados explicando sobre o processo logistico</p>
+                            <div class="relative overflow-hidden rounded-xl bg-black">
+                                <img src="https://imgur.com/dTIVF3q.png" alt="Post Processo Logístico" class="w-full h-auto object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500 lightbox-trigger">
+                                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                    <div class="bg-black/60 text-white px-4 py-2 rounded-full backdrop-blur-sm">
+                                        <i class="fa-solid fa-magnifying-glass-plus mr-2"></i> Clique para ampliar
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SESSÃO 05: SITE E CRM -->
+        <section id="sessao-05" class="py-24 bg-white relative">
+            <div class="max-w-7xl mx-auto px-6">
+                <!-- Parte 1: Site -->
+                <div class="mb-16 reveal">
+                    
+                    <h3 class="text-4xl font-extrabold text-brand-primary mb-6">Diagnóstico do Site</h3>
+                    <div class="w-20 h-1 bg-brand-secondary rounded"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-24 reveal">
+                    <!-- Modelo Cacóla -->
+                    <div class="group">
+                        <h4 class="text-xl font-bold text-gray-800 mb-4 flex justify-between items-center border-b pb-2">
+                            Landing page modelo 
+                            <a href="https://distribuidora.cacola.com.br/" target="_blank" class="text-sm text-blue-600 font-normal hover:underline"><i class="fa-solid fa-external-link-alt"></i> Acessar site</a>
+                        </h4>
+                        <div class="relative rounded-xl overflow-hidden shadow-lg border border-gray-200">
+                            <a href="https://distribuidora.cacola.com.br/" target="_blank" class="block cursor-pointer">
+                                <img src="https://imgur.com/3PDBq2r.png" alt="Cacóla Modelo" class="w-full h-auto hover:scale-105 transition-transform duration-500">
+                                <div class="absolute inset-0 bg-brand-primary/0 group-hover:bg-brand-primary/20 transition-colors flex items-center justify-center">
+                                    <div class="bg-white text-brand-primary px-6 py-2 rounded-full font-bold shadow-xl opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all">
+                                        Visitar Link
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Inspiração Botupapel -->
+                    <div class="group">
+                        <h4 class="text-xl font-bold text-gray-800 mb-4 flex justify-between items-center border-b pb-2">
+                            Inspiração para Landing page
+                            <a href="https://botupapel.com/" target="_blank" class="text-sm text-blue-600 font-normal hover:underline"><i class="fa-solid fa-external-link-alt"></i> Acessar site</a>
+                        </h4>
+                        <div class="relative rounded-xl overflow-hidden shadow-lg border border-gray-200">
+                            <a href="https://botupapel.com/" target="_blank" class="block cursor-pointer">
+                                <img src="https://imgur.com/LiADdMc.png" alt="Botupapel Inspiração" class="w-full h-auto hover:scale-105 transition-transform duration-500">
+                                <div class="absolute inset-0 bg-brand-secondary/0 group-hover:bg-brand-secondary/20 transition-colors flex items-center justify-center">
+                                    <div class="bg-white text-brand-secondary px-6 py-2 rounded-full font-bold shadow-xl opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all">
+                                        Visitar Link
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Parte 2: CRM e Automações -->
+                <div class="mb-16 reveal border-t border-gray-200 pt-16">
+                    <h3 class="text-4xl font-extrabold text-brand-primary mb-6"><span class="text-gradient">CRM</span> Marketing e automações</h3>
+                    
+                    <h4 class="text-2xl font-bold text-gray-800 mb-6">1. Organização da base de clientes</h4>
+                    
+                    <div class="flex flex-col md:flex-row gap-8 items-center mb-12 bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                        <div class="flex-1 relative group cursor-pointer">
+                            <a href="https://orssoluan.github.io/casadasembalagens/" target="_blank" class="block">
+                                <img src="https://imgur.com/yraPtLT.png" alt="Organização Base" class="w-full rounded-lg shadow-md border border-gray-200 group-hover:shadow-xl transition-shadow">
+                                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/10 rounded-lg">
+                                    <div class="bg-white/90 text-brand-primary px-4 py-2 rounded-full text-sm font-bold shadow-sm backdrop-blur-sm">Ver Estrutura Online</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="flex-1 text-center md:text-left">
+                            <p class="text-gray-600 mb-6">Acesse o detalhamento do banco de dados para analisar o mapeamento da carteira de clientes atual.</p>
+                            <a href="https://docs.google.com/spreadsheets/d/1Mntofua5aFzYiuKdbm44Xk3U2JkNadOpbDSvt7PQsLE/edit?usp=sharing" target="_blank" class="inline-flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-full font-bold hover:bg-green-700 transition-colors shadow-lg hover:-translate-y-1 transform">
+                                <i class="fa-solid fa-file-excel"></i> Database excel
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Estratégias e Scripts -->
+                    <h5 class="text-xl font-bold text-brand-primary mb-6 bg-brand-primary/5 inline-block px-4 py-2 rounded-lg">Estratégias: Status da Carteira, Canais, Automação e Scripts</h5>
+
+                    <div class="overflow-x-auto bg-white rounded-2xl shadow-sm border border-gray-200">
+                        <table class="w-full text-left border-collapse min-w-[900px]">
+                            <thead>
+                                <tr class="bg-brand-primary text-white text-sm tracking-wide">
+                                    <th class="p-4 font-semibold w-[20%]">Status da Carteira</th>
+                                    <th class="p-4 font-semibold w-[15%]">Canais</th>
+                                    <th class="p-4 font-semibold w-[30%]">Ações e Automações</th>
+                                    <th class="p-4 font-semibold w-[35%]">Script Sugerido</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm text-gray-700 divide-y divide-gray-100">
+                                
+                                <!-- Status Ativos -->
+                                <tr class="hover:bg-gray-50 transition-colors group">
+                                    <td class="p-4 align-top border-l-4 border-green-500">
+                                        <span class="text-green-700 font-bold text-base block mb-1"><i class="fa-solid fa-user-check mr-2"></i>Ativos</span>
+                                    </td>
+                                    <td class="p-4 align-top">
+                                        <div class="flex flex-col gap-2 font-medium text-gray-600">
+                                            <span class="flex items-center gap-2"><i class="fa-brands fa-whatsapp text-green-500 text-lg"></i> WhatsApp</span>
+                                            <span class="flex items-center gap-2"><i class="fa-solid fa-envelope text-gray-400 text-lg"></i> E-mail</span>
+                                        </div>
+                                    </td>
+                                    <td class="p-4 align-top">
+                                        <p class="leading-relaxed">Disparo automático de ofertas exclusivas ou lançamentos (Ex: Coala).</p>
+                                    </td>
+                                    <td class="p-4 align-top">
+                                        <div class="bg-gray-50 p-3 rounded-lg border border-gray-100 h-full">
+                                            <p class="italic text-gray-600 leading-relaxed">"Oi, [Nome]! Tudo bem? Chegaram novidades na nossa linha de [Categoria] com condições exclusivas para parceiros como a [Nome da Empresa]. Quer dar uma olhada antes de fechar o seu próximo pedido?"</p>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <!-- Em Declínio para Inativo Recente -->
+                                <tr class="hover:bg-gray-50 transition-colors group">
+                                    <td class="p-4 align-top border-l-4 border-yellow-500">
+                                        <span class="text-yellow-600 font-bold text-base block mb-2"><i class="fa-solid fa-clock-rotate-left mr-2"></i>Em Declínio para inativo recente</span>
+                                        <span class="bg-yellow-100 text-yellow-800 text-[10px] font-bold px-2 py-1 rounded inline-block uppercase tracking-wider">Alerta Antecipação: Faltando 5 dias</span>
+                                    </td>
+                                    <td class="p-4 align-top">
+                                        <div class="flex flex-col gap-2 font-medium text-gray-600">
+                                            <span class="flex items-center gap-2"><i class="fa-solid fa-list-check text-brand-primary text-lg"></i> Tarefa CRM</span>
+                                            <span class="flex items-center gap-2"><i class="fa-brands fa-whatsapp text-green-500 text-lg"></i> WhatsApp</span>
+                                            <span class="flex items-center gap-2"><i class="fa-solid fa-envelope text-gray-400 text-lg"></i> E-mail</span>
+                                        </div>
+                                    </td>
+                                    <td class="p-4 align-top">
+                                        <ul class="list-disc list-outside ml-4 space-y-2 leading-relaxed">
+                                            <li>O CRM gera tarefa com <span class="has-tooltip">SLA<span class="tooltip-text">Service Level Agreement: Tempo limite.</span></span> de 24h para o vendedor (Cleber/Guilherme) ligar ou agendar visita.</li>
+                                            <li>Disparo automático com lembrete de reposição programada contendo os itens da última compra.</li>
+                                        </ul>
+                                    </td>
+                                    <td class="p-4 align-top">
+                                        <div class="bg-gray-50 p-3 rounded-lg border border-gray-100 h-full">
+                                            <p class="italic text-gray-600 leading-relaxed">"Oi, [Nome]! Tudo bem? Pelo nosso controle de abastecimento, o estoque de [Categoria] da [Nome da Empresa] deve estar finalizando nos próximos dias. Quer que eu já deixe separado o seu pedido de reposição para garantirmos a entrega sem risco de faltar produto por aí?"</p>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <!-- Status Inativo Recente -->
+                                <tr class="hover:bg-gray-50 transition-colors group">
+                                    <td class="p-4 align-top border-l-4 border-orange-500">
+                                        <span class="text-orange-600 font-bold text-base block mb-1"><i class="fa-solid fa-user-minus mr-2"></i>Inativo Recente</span>
+                                    </td>
+                                    <td class="p-4 align-top">
+                                        <div class="flex flex-col gap-2 font-medium text-gray-600">
+                                            <span class="flex items-center gap-2"><i class="fa-solid fa-list-check text-brand-primary text-lg"></i> Tarefa CRM</span>
+                                            <span class="flex items-center gap-2"><i class="fa-brands fa-whatsapp text-green-500 text-lg"></i> WhatsApp</span>
+                                        </div>
+                                    </td>
+                                    <td class="p-4 align-top">
+                                        <ul class="list-disc list-outside ml-4 space-y-2 leading-relaxed">
+                                            <li>Envio de mensagem no WhatsApp com botão de confirmação rápida ("Repetir pedido anterior").</li>
+                                            <li>O CRM gera tarefa com SLA de 24h para o vendedor (Cleber/Guilherme) ligar ou agendar visita para checar estoque de itens.</li>
+                                        </ul>
+                                    </td>
+                                    <td class="p-4 align-top">
+                                        <div class="bg-gray-50 p-3 rounded-lg border border-gray-100 h-full">
+                                            <p class="italic text-gray-600 leading-relaxed">"Oi, [Nome]! Tudo bem? Notei que o prazo habitual de reposição de [Categoria] de vocês passou alguns dias do normal. Tivemos algum imprevisto na última entrega ou mudou alguma demanda da operação? Me avisa se precisar que eu envie o orçamento atualizado para rodarmos o pedido hoje."</p>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <!-- Em Declínio para Inativo Antigo -->
+                                <tr class="hover:bg-gray-50 transition-colors group">
+                                    <td class="p-4 align-top border-l-4 border-red-500">
+                                        <span class="text-red-600 font-bold text-base block mb-2"><i class="fa-solid fa-skull-crossbones mr-2"></i>Em Declínio para inativo antigo</span>
+                                        <div class="flex flex-col gap-1 items-start">
+                                            <span class="bg-red-100 text-red-800 text-[10px] font-bold px-2 py-1 rounded inline-block uppercase tracking-wider">Alerta Antecipação: Faltando 5 dias</span>
+                                            <span class="bg-black text-white text-[10px] font-bold px-2 py-1 rounded inline-block uppercase tracking-wider"><i class="fa-solid fa-triangle-exclamation text-yellow-400 mr-1"></i> Risco Severo de Churn</span>
+                                        </div>
+                                    </td>
+                                    <td class="p-4 align-top">
+                                        <div class="flex flex-col gap-2 font-medium text-gray-600">
+                                            <span class="flex items-center gap-2"><i class="fa-solid fa-list-check text-brand-primary text-lg"></i> Tarefa CRM</span>
+                                            <span class="flex items-center gap-2"><i class="fa-brands fa-whatsapp text-green-500 text-lg"></i> WhatsApp</span>
+                                            <span class="flex items-center gap-2"><i class="fa-solid fa-envelope text-gray-400 text-lg"></i> E-mail</span>
+                                        </div>
+                                    </td>
+                                    <td class="p-4 align-top">
+                                        <ul class="list-disc list-outside ml-4 space-y-2 leading-relaxed">
+                                            <li>O CRM gera tarefa com SLA crítico de 12h para o vendedor (Cleber/Guilherme) ligar ou agendar visita.</li>
+                                            <li>Automação envia condição especial (desconto de lote, frete grátis regional ou brinde).</li>
+                                        </ul>
+                                    </td>
+                                    <td class="p-4 align-top">
+                                        <div class="bg-gray-50 p-3 rounded-lg border border-gray-100 h-full">
+                                            <p class="italic text-gray-600 leading-relaxed">"Oi, [Nome], tudo bem? Percebi que estamos há um tempo sem abastecer a [Nome da Empresa]. Sei que a rotina é corrida, mas queria entender se você cobriu a demanda com outro fornecedor por questão de preço ou prazo. Tenho uma condição especial na linha de [Categoria] hoje para conseguirmos retomar nossa parceria."</p>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <!-- Status Inativo Antigo -->
+                                <tr class="hover:bg-gray-50 transition-colors group">
+                                    <td class="p-4 align-top border-l-4 border-gray-800">
+                                        <span class="text-gray-800 font-bold text-base block mb-1"><i class="fa-solid fa-ghost mr-2"></i>Inativo Antigo</span>
+                                    </td>
+                                    <td class="p-4 align-top">
+                                        <div class="flex flex-col gap-2 font-medium text-gray-600">
+                                            <span class="flex items-center gap-2"><i class="fa-solid fa-envelope-open-text text-gray-500 text-lg"></i> E-mail Mkt</span>
+                                            <span class="flex items-center gap-2"><i class="fa-brands fa-whatsapp text-green-500 text-lg"></i> WhatsApp</span>
+                                        </div>
+                                    </td>
+                                    <td class="p-4 align-top">
+                                        <ul class="list-disc list-outside ml-4 space-y-2 leading-relaxed">
+                                            <li>Entrada na régua mensal de reativação com catálogos por segmento e cases de sucesso locais.</li>
+                                        </ul>
+                                    </td>
+                                    <td class="p-4 align-top">
+                                        <div class="bg-gray-50 p-3 rounded-lg border border-gray-100 h-full">
+                                            <p class="italic text-gray-600 leading-relaxed">"Oi, [Nome]! Tudo bem? Faz um tempo que não nos falamos. Atualizamos a nossa linha de [Saneantes / Descartáveis / Embalagens] com novos produtos e condições diferenciadas. Posso te mandar nosso catálogo com os itens mais vendidos para o seu setor ou passar aí rapidamente para conversarmos?"</p>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Parte 3: Simulador CRM -->
+                <div class="reveal mt-20">
+                    <h4 class="text-2xl font-bold text-gray-800 mb-6 flex items-center justify-between">
+                        <span><i class="fa-solid fa-laptop-medical text-brand-secondary mr-2"></i> 2. CRM de Vendas <span class="text-sm font-normal text-gray-400 bg-gray-100 px-2 py-1 rounded ml-2">Simulação Interativa</span></span>
+                    </h4>
+                    
+                    <!-- Container que engloba o código do CRM adaptado -->
+                    <div id="crm-app" class="crm-simulator-wrapper shadow-2xl border border-brand-primary/20 flex flex-col">
+                        
+                        <!-- Header CRM Interno -->
+                        <div class="h-14 flex items-center justify-between px-4 border-b border-white/10 bg-[#251940] shrink-0 z-20 relative">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 bg-[#00D982] rounded flex items-center justify-center text-[#36255D] font-bold text-xs">
+                                    <i class="fa-solid fa-box"></i>
+                                </div>
+                                <span class="text-sm font-bold tracking-wide text-white">Fluxo KanBan Automático</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="window.crmToggleSimulation()" id="crm-btn-control" class="bg-[#00D982] text-[#36255D] px-3 py-1 text-xs rounded-full font-bold hover:bg-white transition-colors flex items-center gap-1">
+                                    <i class="fa-solid fa-play"></i> <span id="crm-btn-text">Iniciar</span>
+                                </button>
+                                <button onclick="window.crmResetSimulation()" class="border border-white/30 px-3 py-1 text-xs rounded-full hover:bg-white/10 text-white transition-colors">
+                                    <i class="fa-solid fa-rotate-right"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Main Content CRM Interno -->
+                        <div class="flex-1 flex relative p-3 gap-3 overflow-hidden bg-[#36255D]">
+                            
+                            <!-- ORIGEM (Esquerda) -->
+                            <div class="w-1/4 flex flex-col gap-4 relative bg-[#251940]/70 backdrop-blur-sm rounded-lg p-3 h-full border border-white/10">
+                                <h2 class="text-[#00D982] font-bold text-xs uppercase tracking-wider mb-1 border-b border-white/10 pb-1">1. Origem</h2>
+                                <div class="flex-1 flex flex-col justify-around items-center relative" id="crm-journey-container">
+                                    <div class="absolute w-px bg-white/10 h-[80%] left-1/2 transform -translate-x-1/2 z-0"></div>
+
+                                    <!-- Step 1 -->
+                                    <div class="relative z-10 w-full flex justify-center gap-2" id="crm-step-source">
+                                        <div class="flex flex-col items-center gap-1">
+                                            <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-lg source-node text-xs" id="crm-src-meta">
+                                                <i class="fa-brands fa-meta"></i>
+                                            </div>
+                                            <span class="text-[10px] text-gray-300">Meta</span>
+                                        </div>
+                                        <div class="flex flex-col items-center gap-1">
+                                            <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-white shadow-lg source-node text-xs" id="crm-src-google">
+                                                <i class="fa-brands fa-google"></i>
+                                            </div>
+                                            <span class="text-[10px] text-gray-300">Google</span>
+                                        </div>
+                                    </div>
+                                    <i class="fa-solid fa-arrow-down text-white/30 z-10 text-[10px]"></i>
+
+                                    <!-- Step 2 -->
+                                    <div class="relative z-10 flex flex-col items-center gap-1 w-full" id="crm-step-typeform">
+                                        <div class="w-full bg-gray-800 border border-gray-600 p-2 rounded text-center relative overflow-hidden">
+                                            <div class="absolute top-0 left-0 w-1 h-full bg-[#00D982]"></div>
+                                            <i class="fa-solid fa-clipboard-list text-sm text-white"></i>
+                                            <div class="text-[10px] font-bold text-white mt-1">Typeform</div>
+                                        </div>
+                                    </div>
+                                    <i class="fa-solid fa-arrow-down text-white/30 z-10 text-[10px]"></i>
+
+                                    <!-- Step 3 -->
+                                    <div class="relative z-10 flex flex-col items-center gap-1 w-full" id="crm-step-whatsapp">
+                                        <div class="w-10 h-10 bg-[#25D366] rounded-full flex items-center justify-center text-white shadow-lg text-lg relative">
+                                            <i class="fa-brands fa-whatsapp"></i>
+                                        </div>
+                                        <span class="text-[10px] text-gray-300">Whatsapp</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- PIPELINES (Direita) -->
+                            <div class="flex-1 flex flex-col gap-3 h-full overflow-hidden">
+                                
+                                <!-- Pipeline 1 -->
+                                <div class="flex-1 bg-[#251940]/70 backdrop-blur-sm rounded-lg p-3 flex flex-col relative border border-white/10 min-h-0">
+                                    <div class="flex justify-between items-center mb-2 border-b border-white/10 pb-1 shrink-0">
+                                        <h2 class="text-[#00D982] font-bold text-sm"><i class="fa-solid fa-people-arrows mr-2"></i>2. Central de Vendas</h2>
+                                        <span class="text-[9px] bg-white/10 px-2 py-0.5 rounded text-gray-300">Objetivo: Fechar Venda</span>
+                                    </div>
+                                    <div class="flex-1 flex overflow-x-auto pb-1 gap-2 custom-scrollbar" id="crm-pipeline-central">
+                                        <!-- Inject -->
+                                    </div>
+                                </div>
+
+                                <!-- Botão Planilha -->
+                                <div class="h-8 flex items-center justify-center relative shrink-0">
+                                    <div class="absolute w-full h-px bg-gradient-to-r from-transparent via-[#00D982] to-transparent opacity-30"></div>
+                                    <button onclick="window.crmLoadFromPlanilha()" class="bg-[#36255D] px-4 py-1 z-10 flex items-center gap-2 border border-[#00D982] rounded-full shadow-[0_0_10px_rgba(0,217,130,0.3)] hover:bg-[#00D982] transition-all text-[#00D982] group cursor-pointer">
+                                        <i class="fa-solid fa-file-excel group-hover:text-[#36255D]"></i>
+                                        <span class="text-[10px] font-bold text-white group-hover:text-[#36255D] transition-colors">Novos clientes na planilha</span>
+                                    </button>
+                                </div>
+
+                                <!-- Pipeline 2 -->
+                                <div class="flex-1 bg-[#251940]/70 backdrop-blur-sm rounded-lg p-3 flex flex-col border border-white/10 min-h-0">
+                                    <div class="flex justify-between items-center mb-2 border-b border-white/10 pb-1 shrink-0">
+                                        <h2 class="text-[#00D982] font-bold text-sm"><i class="fa-solid fa-box-open mr-2"></i>3. Pós Vendas</h2>
+                                        <span class="text-[9px] bg-white/10 px-2 py-0.5 rounded text-gray-300">Objetivo: Retenção e LTV</span>
+                                    </div>
+                                    <div class="flex-1 flex overflow-x-auto pb-1 gap-2 custom-scrollbar" id="crm-pipeline-pos">
+                                        <!-- Inject -->
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SESSÃO 06: ROADMAP -->
+        <section id="sessao-06" class="py-24 bg-[#2C328E] relative text-white">
+            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+            <div class="max-w-6xl mx-auto px-6 relative z-10 text-center">
+                <div class="mb-12 reveal">
+                    
+                    <h3 class="text-4xl font-extrabold mb-4">Roadmap</h3>
+                </div>
+                
+                <div class="bg-white/5 p-4 rounded-2xl border border-white/10 backdrop-blur-sm reveal inline-block max-w-full">
+                    <img src="https://imgur.com/7yyz09A.png" alt="Roadmap" class="w-full h-auto rounded-xl shadow-2xl lightbox-trigger">
+                    <p class="mt-4 text-xs text-gray-400"><i class="fa-solid fa-magnifying-glass-plus"></i> Clique no Roadmap para visualizar em tela cheia.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SESSÃO 13: PRÓXIMOS PASSOS -->
+        <section id="sessao-13" class="py-24 bg-brand-secondary text-white relative overflow-hidden">
+            <!-- Efeito Parallax diagonal no fundo -->
+            <div class="absolute inset-0 bg-white opacity-5 transform -skew-y-12 scale-150 origin-top-left z-0 pointer-events-none"></div>
+            
+            <div class="max-w-4xl mx-auto px-6 text-center relative z-10">
+                
+                <h4 class="text-4xl md:text-5xl font-extrabold mb-10 reveal">O QUE ACONTECEU ESSA SEMANA</h4>
+                
+                <div class="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20 mb-12 reveal">
+                    <p class="text-xl md:text-2xl font-medium leading-relaxed">
+                        "Entendemos de forma mais aprofundada como está o seu marketing e da sua concorrência."
+                    </p>
+                </div>
+
+                <div class="reveal">
+                    <h4 class="text-2xl font-bold mb-6 flex items-center justify-center gap-3">
+                        <i class="fa-solid fa-forward-step"></i> PRÓXIMOS PASSOS:
+                    </h4>
+                    <p class="text-lg bg-black/20 py-4 px-8 rounded-full inline-block font-semibold">
+                        Entrega final do planejamento de execução junto com os artefatos comerciais.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-[#E50914] text-white py-12 border-t-4 border-black">
+        <div class="max-w-6xl mx-auto px-6 flex flex-col items-center justify-center text-center">
+            <p class="text-sm font-bold uppercase tracking-widest mb-4 opacity-80">Produzido por:</p>
+            <img src="https://imgur.com/SU08Zb0.png" alt="V4 Silva Anchieta & Co. Logo" class="h-16 md:h-20 object-contain hover:scale-110 transition-transform">
+        </div>
+    </footer>
+
+    <!-- LIGHTBOX MODAL -->
+    <div id="lightbox">
+        <img id="lightbox-img" src="" alt="Imagem Ampliada">
+        <div class="absolute top-4 right-4 text-white text-3xl cursor-pointer hover:text-brand-secondary" onclick="closeLightbox()">
+            <i class="fa-solid fa-xmark"></i>
+        </div>
+    </div>
+
+    <!-- SCRIPTS DE INTERAÇÃO -->
+    <script>
+        
+        // 1. Sticky Header com Glassmorphism
+        const header = document.getElementById('main-header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('bg-white/80', 'shadow-md', 'backdrop-blur-md');
+                header.classList.remove('bg-white/10', 'border-white/20');
+            } else {
+                header.classList.remove('bg-white/80', 'shadow-md', 'backdrop-blur-md');
+                header.classList.add('bg-white/10', 'border-white/20');
+            }
+        });
+
+        // 2. Scroll Reveal com Intersection Observer
+        const revealElements = document.querySelectorAll('.reveal');
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    // Optional: Stop observing once revealed
+                    // observer.unobserve(entry.target); 
+                }
+            });
+        }, {
+            root: null,
+            threshold: 0.15,
+            rootMargin: "0px 0px -50px 0px"
+        });
+
+        revealElements.forEach(el => revealObserver.observe(el));
+
+        // 3. Lightbox Logic
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const triggers = document.querySelectorAll('.lightbox-trigger');
+
+        triggers.forEach(trigger => {
+            trigger.addEventListener('click', (e) => {
+                e.preventDefault(); // Prevents link opening if wrapped in <a> without target=_blank (not our case here, but good practice)
+                const src = trigger.tagName === 'IMG' ? trigger.src : trigger.querySelector('img').src;
+                lightboxImg.src = src;
+                lightbox.style.display = 'flex';
+                document.body.style.overflow = 'hidden'; // Prevent scrolling
+            });
+        });
+
+        function closeLightbox() {
+            lightbox.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Fechar lightbox ao clicar fora da imagem
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) closeLightbox();
+        });
+
+        // Fechar com ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && lightbox.style.display === 'flex') closeLightbox();
+        });
+
+
+        // Para evitar conflito global e manter limpo, envolvo a lógica do CRM e exponho apenas o necessário.
+        (() => {
+            const PIPELINE_CENTRAL_STAGES = ['Novo lead', 'Contato', 'Necessidade', 'Orçamento', 'Negociação', 'Venda', 'Perdido'];
+            const PIPELINE_POS_STAGES = ['Recuperar', 'Contato', 'Necessidade', 'Orçamento', 'Negociação', 'Ganho', 'Perdido'];
+            
+            const NAMES = ["Ana", "Bruno", "Carla", "Daniel", "Edu.", "Ferna.", "Gust.", "Hele.", "Igor", "Julia", "Marc.", "Bia."];
+            const INTERESTS = ["Clínica", "Condomínio", "Escola", "Hotel", "Indústria", "Padaria", "Restaurante"];
+            const PREP_METHODS = ["Papelão", "Sacos", "Fitas", "Bolha", "Personal."];
+            const POS_STATUSES = ["Em declínio", "Inativo Rec.", "Inativo Ant."];
+            
+            let isSimulating = false;
+            let simulationInterval;
+            let leadIdCounter = 1;
+
+            const pipelineCentralEl = document.getElementById('crm-pipeline-central');
+            const pipelinePosEl = document.getElementById('crm-pipeline-pos');
+            const btnControl = document.getElementById('crm-btn-control');
+            const btnText = document.getElementById('crm-btn-text');
+            const crmWrapper = document.getElementById('crm-app'); // Para limitar as animações a este div
+
+            function initPipelines() {
+                pipelineCentralEl.innerHTML = '';
+                pipelinePosEl.innerHTML = '';
+                PIPELINE_CENTRAL_STAGES.forEach(stage => pipelineCentralEl.appendChild(createColumn(stage, 'central')));
+                PIPELINE_POS_STAGES.forEach(stage => pipelinePosEl.appendChild(createColumn(stage, 'pos')));
+            }
+
+            function createColumn(title, type) {
+                const div = document.createElement('div');
+                div.className = 'flex-1 min-w-[100px] bg-white/5 rounded p-1 flex flex-col h-full';
+                div.id = `crm-col-${type}-${title.replace(/\s+/g, '-')}`;
+                
+                let headerColor = 'text-gray-300';
+                if(title === 'Venda' || title === 'Ganho') headerColor = 'text-[#00D982] font-bold';
+                if(title === 'Perdido') headerColor = 'text-red-400';
+
+                div.innerHTML = `
+                    <div class="text-[9px] uppercase font-semibold mb-1 ${headerColor} border-b border-white/10 pb-0.5 flex justify-between shrink-0">
+                        ${title.substring(0,8)} <span class="crm-count text-gray-500">0</span>
+                    </div>
+                    <div class="crm-cards-container flex-1 overflow-y-auto space-y-1 custom-scrollbar pb-1 min-h-[50px]"></div>
+                `;
+                return div;
+            }
+
+            window.crmToggleSimulation = function() {
+                if (isSimulating) {
+                    isSimulating = false;
+                    btnControl.innerHTML = '<i class="fa-solid fa-play"></i> <span>Continuar</span>';
+                    btnControl.classList.add('bg-[#00D982]', 'text-[#36255D]');
+                    btnControl.classList.remove('bg-red-500', 'text-white');
+                    clearTimeout(simulationInterval);
+                } else {
+                    isSimulating = true;
+                    btnControl.innerHTML = '<i class="fa-solid fa-pause"></i> <span>Pausar</span>';
+                    btnControl.classList.remove('bg-[#00D982]', 'text-[#36255D]');
+                    btnControl.classList.add('bg-red-500', 'text-white');
+                    spawnLoop();
+                    progressLoop();
+                }
+            }
+
+            window.crmResetSimulation = function() {
+                if(isSimulating) window.crmToggleSimulation();
+                document.querySelectorAll('.crm-cards-container').forEach(c => c.innerHTML = '');
+                updateCounts();
+                document.querySelectorAll('.lead-dot').forEach(d => d.remove());
+            }
+
+            function spawnLoop() {
+                if (!isSimulating) return;
+                createNewLead();
+                simulationInterval = setTimeout(spawnLoop, Math.random() * 2000 + 2000);
+            }
+
+            function createNewLead() {
+                const id = leadIdCounter++;
+                const name = NAMES[Math.floor(Math.random() * NAMES.length)];
+                const source = Math.random() > 0.5 ? 'crm-src-meta' : 'crm-src-google';
+                
+                const startEl = document.getElementById(source);
+                const typeformEl = document.getElementById('crm-step-typeform');
+                const whatsappEl = document.getElementById('crm-step-whatsapp');
+
+                if(!startEl) return;
+
+                const dot = document.createElement('div');
+                dot.className = 'lead-dot flex items-center justify-center text-[6px] text-white font-bold';
+                dot.innerHTML = '<i class="fa-solid fa-user"></i>';
+                crmWrapper.appendChild(dot); // Append ao wrapper em vez do body global
+
+                const getCenterRel = (el) => {
+                    const rect = el.getBoundingClientRect();
+                    const wrapRect = crmWrapper.getBoundingClientRect();
+                    return { 
+                        x: (rect.left - wrapRect.left) + rect.width / 2, 
+                        y: (rect.top - wrapRect.top) + rect.height / 2 
+                    };
+                };
+
+                const startPos = getCenterRel(startEl);
+                dot.style.left = `${startPos.x - 8}px`;
+                dot.style.top = `${startPos.y - 8}px`;
+
+                setTimeout(() => {
+                    const tfPos = getCenterRel(typeformEl);
+                    dot.style.left = `${tfPos.x - 8}px`;
+                    dot.style.top = `${tfPos.y - 8}px`;
+                    
+                    setTimeout(() => {
+                        const waPos = getCenterRel(whatsappEl);
+                        dot.style.left = `${waPos.x - 8}px`;
+                        dot.style.top = `${waPos.y - 8}px`;
+
+                        setTimeout(() => {
+                            dot.remove();
+                            addCardToPipeline(name, id, 'central', 'Novo lead');
+                        }, 600);
+                    }, 600);
+                }, 100);
+            }
+
+            function addCardToPipeline(name, id, pipelineType, stageName) {
+                const colId = `crm-col-${pipelineType}-${stageName.replace(/\s+/g, '-')}`;
+                const col = document.getElementById(colId);
+                if (!col) return;
+
+                const interest = INTERESTS[Math.floor(Math.random() * INTERESTS.length)];
+                const prep = PREP_METHODS[Math.floor(Math.random() * PREP_METHODS.length)];
+                const TAG_COLORS = ['bg-gray-200 text-gray-800', 'bg-blue-100 text-blue-800', 'bg-green-100 text-green-800', 'bg-yellow-100 text-yellow-800'];
+                const tagColor = TAG_COLORS[interest.length % TAG_COLORS.length];
+
+                let posStatusHtml = '';
+                if (pipelineType === 'pos') {
+                    const status = POS_STATUSES[Math.floor(Math.random() * POS_STATUSES.length)];
+                    let sColor = 'bg-orange-100 text-orange-800 border-orange-200';
+                    if (status.includes('Ant.')) sColor = 'bg-red-100 text-red-800 border-red-200';
+                    posStatusHtml = `<div class="mt-0.5"><span class="inline-block px-1 rounded ${sColor} border text-[7px] leading-tight"><i class="fa-solid fa-exclamation mr-0.5"></i>${status}</span></div>`;
+                }
+
+                const card = document.createElement('div');
+                card.className = 'crm-card';
+                card.dataset.pipeline = pipelineType;
+                card.dataset.stage = stageName;
+
+                card.innerHTML = `
+                    <div class="font-bold flex justify-between items-start text-[#36255D] text-[10px] leading-none mb-1">
+                        ${name} <span class="text-gray-400 font-normal">#${id}</span>
+                    </div>
+                    <div class="leading-tight">
+                        <span class="inline-block px-1 rounded ${tagColor} text-[7px] font-bold">${interest}</span>
+                        <div class="text-[8px] text-[#36255D] bg-gray-100 px-1 rounded mt-0.5 whitespace-nowrap overflow-hidden text-ellipsis">
+                            <i class="fa-solid fa-box mr-0.5 opacity-50"></i>${prep}
+                        </div>
+                        ${posStatusHtml}
+                    </div>
+                `;
+
+                col.querySelector('.crm-cards-container').appendChild(card);
+                updateCounts();
+            }
+
+            function progressLoop() {
+                if (!isSimulating) return;
+                const cards = document.querySelectorAll('.crm-card:not(.locked)');
+                if (cards.length > 0) {
+                    const card = cards[Math.floor(Math.random() * cards.length)];
+                    moveCardLogic(card);
+                }
+                setTimeout(progressLoop, 1000);
+            }
+
+            function moveCardLogic(card) {
+                const currentStage = card.dataset.stage;
+                const pipeline = card.dataset.pipeline;
+                const stages = pipeline === 'central' ? PIPELINE_CENTRAL_STAGES : PIPELINE_POS_STAGES;
+                const currentIndex = stages.indexOf(currentStage);
+
+                if (currentStage === 'Venda' || currentStage === 'Ganho' || currentStage === 'Perdido') {
+                    card.classList.add('locked');
+                    return;
+                }
+
+                const r = Math.random();
+                let nextStage = '';
+
+                if (r < 0.05) {
+                    nextStage = 'Perdido';
+                } else if (currentIndex < stages.length - 2) {
+                    nextStage = stages[currentIndex + 1];
+                } else {
+                    return;
+                }
+
+                const nextColId = `crm-col-${pipeline}-${nextStage.replace(/\s+/g, '-')}`;
+                const nextCol = document.getElementById(nextColId);
+
+                if (nextCol) {
+                    card.style.opacity = "0.5";
+                    setTimeout(() => {
+                        card.dataset.stage = nextStage;
+                        card.style.opacity = "1";
+                        nextCol.querySelector('.crm-cards-container').appendChild(card);
+                        
+                        if (nextStage === 'Venda' || nextStage === 'Ganho') {
+                            card.classList.add('sold');
+                        } else if (nextStage === 'Perdido') {
+                            card.style.backgroundColor = '#ffecec';
+                            card.style.borderLeftColor = '#ff5555';
+                        }
+                        updateCounts();
+                    }, 200);
+                }
+            }
+
+            window.crmLoadFromPlanilha = function() {
+                const qtd = Math.floor(Math.random() * 2) + 1;
+                for(let i = 0; i < qtd; i++) {
+                    setTimeout(() => {
+                        addCardToPipeline(NAMES[Math.floor(Math.random() * NAMES.length)], leadIdCounter++, 'pos', 'Recuperar');
+                    }, i * 300);
+                }
+            }
+
+            function updateCounts() {
+                document.querySelectorAll('[id^="crm-col-"]').forEach(col => {
+                    const count = col.querySelectorAll('.crm-card').length;
+                    col.querySelector('.crm-count').innerText = count;
+                });
+            }
+
+            // Init call
+            initPipelines();
+        })();
+    </script>
+</body>
+</html>
