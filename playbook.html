@@ -1,1 +1,911 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playbook Comercial - Casa das Embalagens</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Cores Casa das Embalagens */
+            --primary: #252B86; /* Azul principal */
+            --primary-dark: #191d5c; /* Azul escuro para contrastes */
+            --accent-orange: #F86A01; /* Laranja secundário */
+            --bg-white: #FFFFFF; /* Fundo branco das páginas */
+            --text-dark: #222222;
+            --text-light: #444444;
+            --gray-light: #F4F5F8;
+            
+            --font-main: 'Poppins', sans-serif;
+            --font-deco: 'Playfair Display', serif;
+        }
 
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #E5E7EB; /* Fundo externo da tela */
+            font-family: var(--font-main);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            background-color: var(--bg-white); /* Regra 3: fundo branco */
+            margin: 10mm auto;
+            position: relative;
+            page-break-after: always;
+            padding: 25mm 20mm;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media print {
+            body { background: none; }
+            .page { 
+                margin: 0; 
+                box-shadow: none; 
+                height: auto;
+                min-height: 297mm;
+                page-break-after: always;
+                border: none;
+                display: block;
+            }
+            .page-cover, .page-backcover {
+                display: flex;
+                height: 297mm;
+            }
+        }
+
+        /* Capa */
+        .page-cover {
+            background-color: var(--primary);
+            color: var(--bg-white);
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40mm 20mm;
+        }
+
+        .page-cover .logo {
+            max-width: 300px;
+            margin-bottom: 60px;
+        }
+
+        .page-cover h1 {
+            font-family: var(--font-deco);
+            font-size: 36pt;
+            margin: 0 0 15px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--bg-white);
+            line-height: 1.2;
+        }
+
+        .page-cover h2 {
+            font-weight: 400;
+            font-size: 20pt;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin: 0;
+            color: var(--accent-orange);
+            border-bottom: none;
+        }
+
+        /* Contracapa - Regra 2 */
+        .page-backcover {
+            background-color: var(--primary);
+            justify-content: center;
+            align-items: center;
+        }
+        .page-backcover .logo-large {
+            max-width: 400px;
+        }
+
+        /* Tipografia de Conteúdo */
+        h1, h2, h3, h4 {
+            color: var(--primary);
+            margin-top: 0;
+            page-break-after: avoid;
+        }
+
+        h2 {
+            font-size: 16pt;
+            border-bottom: 2px solid var(--accent-orange);
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+            margin-top: 30px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+        
+        h2:first-child { margin-top: 0; }
+
+        h3 {
+            font-size: 13pt;
+            color: var(--primary-dark);
+            margin-top: 25px;
+            margin-bottom: 12px;
+        }
+
+        p {
+            font-size: 10.5pt;
+            color: var(--text-light);
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        strong {
+            color: var(--primary-dark);
+        }
+
+        /* Funis */
+        .funnel-container {
+            background-color: var(--gray-light);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary);
+            page-break-inside: avoid;
+        }
+
+        .funnel-title {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 11pt;
+        }
+
+        .funnel-flow {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .step {
+            background-color: var(--primary);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 9pt;
+            font-weight: 600;
+        }
+
+        .step-win { background-color: var(--accent-orange); }
+
+        .arrow {
+            color: var(--accent-orange);
+            font-weight: bold;
+            font-size: 12pt;
+        }
+
+        /* Scripts - Regra 4: Itálico */
+        .script-box {
+            background-color: #FAFAFA;
+            border-left: 4px solid var(--accent-orange);
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+            page-break-inside: avoid;
+        }
+
+        .script-box p {
+            margin: 0;
+            font-style: italic; /* Aplicação de itálico mandatória */
+            font-size: 11pt;
+            color: var(--text-dark);
+            font-weight: 500;
+            line-height: 1.5;
+            text-align: left;
+        }
+
+        /* Tabelas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 9.5pt;
+            page-break-inside: avoid;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        th {
+            background-color: var(--primary);
+            color: var(--bg-white);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 9pt;
+            letter-spacing: 0.5px;
+        }
+
+        tr:nth-child(even) { background-color: var(--gray-light); }
+        tr:last-child td { border-bottom: 2px solid var(--primary); }
+        
+        .td-script .script-box {
+            margin: 0;
+            padding: 10px;
+            font-size: 9pt;
+            background-color: transparent;
+            border-left: 3px solid var(--accent-orange);
+        }
+        .td-script .script-box p { font-size: 10pt; }
+
+        /* Listas */
+        ul, ol {
+            margin-top: 5px;
+            margin-bottom: 15px;
+            padding-left: 20px;
+            color: var(--text-light);
+            font-size: 10.5pt;
+        }
+        li { margin-bottom: 8px; }
+        
+        /* Imagens e Links Especiais */
+        .image-reference {
+            display: block;
+            background: var(--gray-light);
+            padding: 15px;
+            text-align: center;
+            font-size: 9pt;
+            color: var(--text-light);
+            border: 1px dashed #CCC;
+            border-radius: 6px;
+            margin: 15px 0;
+            page-break-inside: avoid;
+        }
+        
+        .image-reference img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            margin-top: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .action-link {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white !important;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 9pt;
+            margin-top: 10px;
+        }
+
+        .content-area { margin-top: 5mm; }
+        .avoid-break { page-break-inside: avoid; }
+        .force-break { page-break-before: always; }
+
+    </style>
+</head>
+<body>
+
+    <!-- Regra 1: Capa com logo e headline -->
+    <div class="page page-cover">
+        <img src="https://i.imgur.com/motxyUI.png" alt="Logo Casa das Embalagens" class="logo">
+        <h1>Playbook Comercial</h1>
+    </div>
+
+    <!-- PÁGINA 1 -->
+    <div class="page">
+        <div class="content-area">
+            <h2>1. IDENTIDADE COMERCIAL</h2>
+            
+            <div class="avoid-break">
+                <h3>1.1. Proposta central</h3>
+                <div class="script-box">
+                    <p>“Abastecimento que não para: estoque local em Botucatu, atendimento próximo e reposição organizada para a sua empresa.”</p>
+                </div>
+            </div>
+
+            <div class="avoid-break">
+                <h3>Argumentos que sustentam a proposta</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Diferencial</th>
+                            <th>Como utilizar na conversa</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Estoque local</strong></td>
+                            <td>Destacar disponibilidade dos itens efetivamente consultados.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Frota própria</strong></td>
+                            <td>Apresentar as possibilidades de entrega e programação.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Conferência dos pedidos</strong></td>
+                            <td>Explicar o cuidado com separação e identificação dos itens.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Portfólio complementar</strong></td>
+                            <td>Concentrar categorias pertinentes à operação do comprador.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Comodato de equipamentos</strong></td>
+                            <td>Avaliar instalação vinculada ao fornecimento de refis.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="avoid-break">
+                <h3>1.2. Cliente ideal</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Segmento</th>
+                            <th>Necessidade a investigar</th>
+                            <th>Direção da abordagem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Padarias, restaurantes e lanchonetes</strong></td>
+                            <td>Giro, consumo, horários críticos e espaço de armazenagem.</td>
+                            <td>Reposição e adequação dos descartáveis e produtos de limpeza.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Indústrias</strong></td>
+                            <td>Especificações, volume, aprovação de compras e programação.</td>
+                            <td>Abastecimento organizado e entregas programadas.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Clubes e instituições</strong></td>
+                            <td>Consumo, eventos, instalações e equipamentos utilizados.</td>
+                            <td>Continuidade de fornecimento e avaliação de comodato.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Hotéis e serviços</strong></td>
+                            <td>Ocupação, sazonalidade e consumo por operação.</td>
+                            <td>Planejamento de reposição e categorias complementares.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Saúde e instituições de cuidado</strong></td>
+                            <td>Requisitos técnicos, produtos autorizados e procedimento de compra.</td>
+                            <td>Adequação técnica e respeito às exigências do comprador.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- PÁGINA 2 -->
+    <div class="page">
+        <div class="content-area">
+            <h2>2. ORGANIZAÇÃO DOS FUNIS DO CRM</h2>
+            
+            <div class="funnel-container">
+                <div class="funnel-title">2.1. Funil 1 — Novos clientes</div>
+                <div class="funnel-flow">
+                    <span class="step">Novo lead</span><span class="arrow">→</span>
+                    <span class="step">Qualificação</span><span class="arrow">→</span>
+                    <span class="step">Necessidades</span><span class="arrow">→</span>
+                    <span class="step">Orçamento enviado</span><span class="arrow">→</span>
+                    <span class="step" style="background-color: var(--primary-dark);">Negociação</span><span class="arrow">→</span>
+                    <span class="step step-win">Venda ou perdido</span>
+                </div>
+            </div>
+
+            <div class="funnel-container">
+                <div class="funnel-title">2.2. Funil 2 — Recompra e recuperação</div>
+                <div class="funnel-flow">
+                    <span class="step">Recuperação</span><span class="arrow">→</span>
+                    <span class="step">Qualificação</span><span class="arrow">→</span>
+                    <span class="step">Necessidades</span><span class="arrow">→</span>
+                    <span class="step">Orçamento enviado</span><span class="arrow">→</span>
+                    <span class="step" style="background-color: var(--primary-dark);">Negociação</span><span class="arrow">→</span>
+                    <span class="step step-win">Venda ou perdido</span>
+                </div>
+                <div style="margin-top: 15px;">
+                    <strong>Diferenciar os resultados:</strong>
+                    <ul style="margin-bottom: 0;">
+                        <li><strong>Reposição preventiva:</strong> cliente ainda ativo realiza nova compra.</li>
+                        <li><strong>Reativação:</strong> cliente classificado como inativo volta a comprar.</li>
+                        <li><strong>Expansão:</strong> compra de categoria complementar; pode coexistir com reposição ou reativação.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="avoid-break">
+                <h3>2.3. Mensalistas</h3>
+                <div class="funnel-flow" style="margin-bottom: 10px;">
+                    <span class="step">Lista recebida</span><span class="arrow">→</span>
+                    <span class="step">Conferência</span><span class="arrow">→</span>
+                    <span class="step">Lançamento no WSaque</span><span class="arrow">→</span>
+                    <span class="step">Confirmação</span><span class="arrow">→</span>
+                    <span class="step">Separação</span><span class="arrow">→</span>
+                    <span class="step step-win">Entrega</span>
+                </div>
+                <p>O mensalista com cadastro e condições predefinidas <strong>não precisa</strong> passar obrigatoriamente por orçamento em PDF.</p>
+                <p><strong>O atendente deve:</strong></p>
+                <ul>
+                    <li>Conferir itens, quantidades e unidades.</li>
+                    <li>Validar disponibilidade e condições cadastradas.</li>
+                    <li>Confirmar alterações com o comprador.</li>
+                    <li>Registrar o pedido.</li>
+                    <li>Comunicar prazo e andamento.</li>
+                    <li>Atualizar eventual negociação de recuperação já aberta.</li>
+                </ul>
+                <p><em>*Não criar uma negociação de recuperação apenas porque um cliente ativo enviou um pedido espontâneo.</em></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- PÁGINA 3 -->
+    <div class="page">
+        <div class="content-area">
+            <h2>3. CAMPOS OBRIGATÓRIOS DE ENTRADA</h2>
+            
+            <div class="avoid-break">
+                <h3>3.1. Dados preenchidos pelo lead</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Campo</th>
+                            <th>Formato</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>WhatsApp com DDD</strong></td><td>Telefone</td></tr>
+                        <tr><td><strong>E-mail</strong></td><td>Texto</td></tr>
+                        <tr><td><strong>Nome do contato</strong></td><td>Texto</td></tr>
+                        <tr><td><strong>CNPJ</strong></td><td>Validação CNPJ</td></tr>
+                        <tr><td><strong>Qual o seu volume médio de compra?</strong></td><td>Seleção Lista</td></tr>
+                        <tr><td><strong>Cargo</strong></td><td>Texto</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="avoid-break">
+                <h3>3.2. Rastreamento preenchido automaticamente</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Campo</th>
+                            <th>Formato</th>
+                            <th>Descrição</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>UTM Source</strong></td><td>Texto curto — oculto</td><td>Origem do tráfego recebida no link</td></tr>
+                        <tr><td><strong>UTM Medium</strong></td><td>Texto curto — oculto</td><td>Meio de aquisição recebido no link</td></tr>
+                        <tr><td><strong>UTM Campaign</strong></td><td>Texto curto — oculto</td><td>Identificação da campanha</td></tr>
+                        <tr><td><strong>UTM Term</strong></td><td>Texto curto — oculto</td><td>Termo ou parâmetro de segmentação</td></tr>
+                        <tr><td><strong>UTM Content</strong></td><td>Texto curto — oculto</td><td>Identificação do conteúdo ou anúncio</td></tr>
+                        <tr><td><strong>ID do anúncio</strong></td><td>Texto curto — oculto</td><td>Identificador do anúncio</td></tr>
+                        <tr><td><strong>ID do conjunto</strong></td><td>Texto curto — oculto</td><td>Identificador do conjunto de anúncios</td></tr>
+                        <tr><td><strong>ID da campanha</strong></td><td>Texto curto — oculto</td><td>Identificador da campanha</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2 style="margin-top: 30px;">4. AUTOMAÇÕES DE CRM MARKETING</h2>
+
+            <div class="avoid-break">
+                <h3>4.1. Parâmetros de RFM validados</h3>
+                <p><strong>Janelas:</strong></p>
+                <ul>
+                    <li><strong>Recência:</strong> dias desde a última compra confirmada.</li>
+                    <li><strong>Frequência:</strong> pedidos confirmados nos últimos 90 dias móveis.</li>
+                    <li><strong>Monetário:</strong> faturamento confirmado nos últimos 12 meses.</li>
+                    <li><strong>Intervalo médio:</strong> calculado na janela de 90 dias móveis.</li>
+                </ul>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nota</th>
+                            <th>Recência</th>
+                            <th>Frequência — 90 dias</th>
+                            <th>Monetário — 12 meses</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>5</strong></td><td>Até 15 dias</td><td>13 ou mais pedidos</td><td>Acima de R$ 40.953,36</td></tr>
+                        <tr><td><strong>4</strong></td><td>De 16 a 30 dias</td><td>De 7 a 12 pedidos</td><td>De R$ 15.979,31 a R$ 40.953,36</td></tr>
+                        <tr><td><strong>3</strong></td><td>De 31 a 60 dias</td><td>De 4 a 6 pedidos</td><td>De R$ 8.512,01 a R$ 15.979,30</td></tr>
+                        <tr><td><strong>2</strong></td><td>De 61 a 90 dias</td><td>De 2 a 3 pedidos</td><td>De R$ 4.968,91 a R$ 8.512,00</td></tr>
+                        <tr><td><strong>1</strong></td><td>Acima de 90 dias</td><td>De 0 a 1 pedido</td><td>Até R$ 4.968,90</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- PÁGINA 4 -->
+    <div class="page">
+        <div class="content-area">
+            <div class="avoid-break">
+                <h3>4.2. Status de atividade</h3>
+                <p><strong>D:</strong> dias corridos desde a última compra. | <strong>I:</strong> intervalo médio individual.</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Regra definitiva</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>Ativo</strong></td><td>D ≤ I</td></tr>
+                        <tr><td><strong>Inativo recente</strong></td><td>I < D ≤ 2 × I</td></tr>
+                        <tr><td><strong>Inativo antigo</strong></td><td>D > 2 × I</td></tr>
+                        <tr><td><strong>Histórico insuficiente</strong></td><td>Menos de 2 pedidos confirmados no histórico.</td></tr>
+                    </tbody>
+                </table>
+                <p><strong>Cuidados com o cálculo:</strong></p>
+                <ul style="font-size: 9.5pt;">
+                    <li>Calcular a média dos intervalos entre compras, não confundir com quantidade de pedidos.</li>
+                    <li>Conciliar pelo identificador do pedido.</li>
+                    <li>Excluir cancelamentos conforme regra validada e definir o tratamento de devoluções.</li>
+                    <li>Com apenas dois pedidos, confirmar a expectativa de consumo com o comprador.</li>
+                    <li>Se a janela móvel deixar de conter intervalos, não apagar a última compra.</li>
+                </ul>
+            </div>
+
+            <h3>4.3. Matriz de automações e tarefas</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">Status</th>
+                        <th style="width: 15%;">Canais</th>
+                        <th style="width: 35%;">Ações e Automações</th>
+                        <th style="width: 35%;">Script Sugerido</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Ativos</strong></td>
+                        <td>WhatsApp, E-mail</td>
+                        <td>Disparo automático de ofertas ou lançamentos (Ex: Coala).</td>
+                        <td class="td-script">
+                            <div class="script-box"><p>“Oi, [Nome]! Tudo bem? Chegaram novidades na nossa linha de [Categoria] com condições exclusivas para parceiros como a [Empresa]. Quer dar uma olhada antes de fechar o seu próximo pedido?”</p></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Em Declínio (-5 dias)</strong></td>
+                        <td>Tarefa CRM, WhatsApp, E-mail</td>
+                        <td>CRM gera tarefa (SLA 24h) para ligar. Disparo de lembrete de reposição.</td>
+                        <td class="td-script">
+                            <div class="script-box"><p>“Oi, [Nome]! Tudo bem? Pelo controle, o estoque de [Categoria] da [Empresa] deve estar finalizando nos próximos dias. Quer que eu já deixe separado a reposição para garantirmos a entrega?”</p></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Inativo Recente</strong></td>
+                        <td>Tarefa CRM, WhatsApp</td>
+                        <td>WhatsApp com botão "Repetir pedido". Tarefa CRM (SLA 24h) para ligar/visitar.</td>
+                        <td class="td-script">
+                            <div class="script-box"><p>“Oi, [Nome]! Tudo bem? Notei que o prazo habitual de reposição de [Categoria] passou do normal. Tivemos algum imprevisto? Me avisa se precisar do orçamento atualizado hoje.”</p></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Risco Severo (-5 dias antigo)</strong></td>
+                        <td>Tarefa CRM, WhatsApp, E-mail</td>
+                        <td>Tarefa CRM (SLA 12h) para o vendedor. Automação de condição especial.</td>
+                        <td class="td-script">
+                            <div class="script-box"><p>“Oi, [Nome], tudo bem? Estamos há um tempo sem abastecer a [Empresa]. Tenho uma condição especial na linha de [Categoria] hoje para conseguirmos retomar nossa parceria.”</p></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Inativo Antigo</strong></td>
+                        <td>E-mail Mkt, WhatsApp</td>
+                        <td>Régua mensal de reativação com catálogos e cases.</td>
+                        <td class="td-script">
+                            <div class="script-box"><p>“Oi, [Nome]! Faz um tempo que não nos falamos. Atualizamos nossa linha com novos produtos. Posso te mandar nosso catálogo com os itens mais vendidos para o seu setor?”</p></div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- PÁGINA 5 -->
+    <div class="page">
+        <div class="content-area">
+            <h2>5. SCRIPTS DE ATENDIMENTO E CADÊNCIAS</h2>
+            
+            <div class="avoid-break">
+                <h3>5.1. Primeiro contato vindo da Landing Page</h3>
+                <div class="script-box">
+                    <p>“Olá, [Nome]! Sou [Vendedor], da Casa das Embalagens. Recebi sua solicitação para a [Empresa]. Quais itens e quantidades vocês precisam e para quando?”</p>
+                </div>
+                <p>Se os produtos já estiverem informados:</p>
+                <div class="script-box">
+                    <p>“Vi que vocês precisam de [itens]. Vou conferir a disponibilidade. A entrega seria em [local informado]?”</p>
+                </div>
+            </div>
+
+            <div class="avoid-break">
+                <h3>5.2. Qualificação consultiva</h3>
+                <div class="script-box">
+                    <p>“Esses produtos fazem parte da reposição habitual ou atendem uma necessidade pontual?”</p>
+                    <p style="margin-top: 8px;">“Hoje, o que mais pesa na escolha do fornecedor: disponibilidade, prazo, adequação do produto ou condição comercial?”</p>
+                    <p style="margin-top: 8px;">“Você conduz a compra até a aprovação ou outra pessoa também participa?”</p>
+                </div>
+                <p><em>Objetivo: compreender necessidade e decisão, não criar uma barreira para receber orçamento.</em></p>
+            </div>
+
+            <div class="avoid-break">
+                <h3>5.3. Produto indisponível</h3>
+                <div class="script-box">
+                    <p>“Essa marca está indisponível neste momento. Temos uma alternativa com [características verificadas]. Posso te apresentar as especificações e o preço para você avaliar?”</p>
+                </div>
+                <p>Se não houver substituto adequado:</p>
+                <div class="script-box">
+                    <p>“Não tenho uma alternativa compatível confirmada agora. Posso verificar a reposição e te retornar até [prazo viável]?”</p>
+                </div>
+            </div>
+
+            <div class="avoid-break">
+                <h3>5.4. Envio do orçamento e Ligação pós-orçamento</h3>
+                <div class="script-box">
+                    <p>“[Nome], segue a proposta com [resumo]. Considerei [quantidades], entrega em [prazo confirmado] e [condição]. Você consegue avaliar até [data]? Posso retornar nesse dia?”</p>
+                </div>
+                <div class="script-box" style="margin-top: 10px;">
+                    <p>“[Nome], aqui é [Vendedor]. Enviei a proposta da [Empresa]. Você pode falar agora ou prefere outro horário?”</p>
+                </div>
+                <p>Se puder falar, faça perguntas como: <em>"A composição atende? Há ajustes? Quem mais avalia? Qual o próximo passo?"</em></p>
+            </div>
+
+            <div class="avoid-break">
+                <h3>5.5. Cadência de Follow-up</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Momento</th>
+                            <th>Ação Estratégica</th>
+                            <th>Script Sugerido</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Envio</strong></td>
+                            <td>Explicar condições e combinar retorno.</td>
+                            <td class="td-script"><div class="script-box"><p>Ver script de envio de orçamento.</p></div></td>
+                        </tr>
+                        <tr>
+                            <td><strong>D+1 Útil</strong></td>
+                            <td>Confirmar recebimento e pendência.</td>
+                            <td class="td-script"><div class="script-box"><p>“[Nome], recebeu a proposta corretamente? Para avançarmos, o que falta esclarecer: itens, prazo, condição comercial ou aprovação interna?”</p></div></td>
+                        </tr>
+                        <tr>
+                            <td><strong>D+3 Útil</strong></td>
+                            <td>Tratar objeção e definir avanço/pausa.</td>
+                            <td class="td-script"><div class="script-box"><p>“[Nome], queria entender se a compra continua prevista. Há alguma pendência que eu possa resolver ou faz mais sentido programarmos o retorno para outra data?”</p></div></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- PÁGINA 6 -->
+    <div class="page">
+        <div class="content-area">
+            <h2>6. MATRIZ DE OBJEÇÕES E ARGUMENTAÇÃO</h2>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">Objeção</th>
+                        <th style="width: 35%;">Pergunta de Diagnóstico (Script)</th>
+                        <th style="width: 40%;">Condução Recomendada</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>“Está caro.”</strong></td>
+                        <td class="td-script"><div class="script-box"><p>“Estamos comparando os mesmos produtos, unidades, quantidades e frete?”</p></div></td>
+                        <td>Comparar condições equivalentes e custo total. Não conceder desconto automaticamente.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>“Meu fornecedor é mais barato.”</strong></td>
+                        <td class="td-script"><div class="script-box"><p>“Além do preço, há alguma condição de abastecimento que vocês gostariam de melhorar?”</p></div></td>
+                        <td>Explorar necessidade real, sem desqualificar o concorrente.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>“Já tenho fornecedor.”</strong></td>
+                        <td class="td-script"><div class="script-box"><p>“Existe alguma categoria ou situação em que vocês precisem de uma alternativa?”</p></div></td>
+                        <td>Propor fornecimento complementar quando pertinente.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>“Preciso para hoje.”</strong></td>
+                        <td class="td-script"><div class="script-box"><p>“Quais itens, quantidades e endereço?”</p></div></td>
+                        <td>Conferir estoque e logística antes de confirmar.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>“Quero a marca que já uso.”</strong></td>
+                        <td class="td-script"><div class="script-box"><p>“Qual característica ou especificação é indispensável?”</p></div></td>
+                        <td>Apresentar alternativa documentada, sem substituição unilateral.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>“Preciso de frete grátis.”</strong></td>
+                        <td class="td-script"><div class="script-box"><p>“Qual composição do pedido e região de entrega?”</p></div></td>
+                        <td>Consultar política e viabilidade com a direção.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>“Ainda tenho estoque.”</strong></td>
+                        <td class="td-script"><div class="script-box"><p>“Qual a previsão de reposição?”</p></div></td>
+                        <td>Agendar retorno; não forçar compra.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>“Preciso falar com meu gestor.”</strong></td>
+                        <td class="td-script"><div class="script-box"><p>“Quais informações ele precisa para decidir?”</p></div></td>
+                        <td>Preparar proposta clara e resumo encaminhável.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>“Na última entrega veio errado.”</strong></td>
+                        <td class="td-script"><div class="script-box"><p>“O que ocorreu e a situação foi resolvida?”</p></div></td>
+                        <td>Priorizar resolução e responsável, antes de vender novamente.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>“Não quero ficar preso a contrato.”</strong></td>
+                        <td class="td-script"><div class="script-box"><p>“Sua preocupação é consumo, prazo, exclusividade ou saída?”</p></div></td>
+                        <td>Explicar condições do comodato com transparência; não minimizar obrigações.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>“Manda o catálogo.”</strong></td>
+                        <td class="td-script"><div class="script-box"><p>“Qual categoria faz mais sentido para você agora?”</p></div></td>
+                        <td>Enviar seleção relevante; disponibilizar o completo quando solicitado.</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="avoid-break">
+                <h3 style="margin-top: 30px;">Scripts Diversos Adicionais</h3>
+                <p><strong>Mensalista:</strong> <br><em>“Oi, [Nome]! Recebi a lista. Vou conferir os itens, quantidades e disponibilidade. Se houver mudança de produto ou condição, confirmo com você antes de lançar.”</em></p>
+                <p><strong>Linha Coala (Cross-sell ativo):</strong> <br><em>“Vocês utilizam aromatizantes ou limpadores concentrados na operação? Temos opções da linha Coala. Posso entender a aplicação para te indicar os produtos adequados?”</em></p>
+                <p><strong>Encerramento Respeitoso:</strong> <br><em>“[Nome], vou encerrar este acompanhamento para não insistir. Se a necessidade voltar, fico à disposição. Caso prefira, podemos combinar uma data para retomar.”</em></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- PÁGINA 7 -->
+    <div class="page">
+        <div class="content-area">
+            <h2>7. PÓS-VENDA, SEGUNDA COMPRA E CROSS-SELL</h2>
+            
+            <div class="avoid-break">
+                <h3>7.1. Após entrega</h3>
+                <div class="script-box">
+                    <p>“[Nome], o pedido chegou completo e em boas condições? Houve alguma diferença nos itens ou alguma dúvida que precisamos resolver?”</p>
+                </div>
+                <p><em>Registrar ocorrência, responsável e prazo de retorno. Não encerrar uma reclamação apenas porque a mensagem foi encaminhada.</em></p>
+            </div>
+
+            <div class="avoid-break">
+                <h3>7.2. Primeira compra</h3>
+                <div class="script-box">
+                    <p>“Em quanto tempo vocês imaginam precisar desses itens novamente? Posso registrar essa previsão para facilitar a próxima reposição?”</p>
+                    <p style="margin-top: 10px;">“Além de [categoria comprada], vocês também utilizam [categoria complementar]? Posso incluir uma opção para avaliar no próximo abastecimento?”</p>
+                </div>
+            </div>
+
+            <h2 style="margin-top: 30px;">8. ROTINAS COM OS VENDEDORES</h2>
+            
+            <div class="avoid-break">
+                <h3>8.1. Rotina diária</h3>
+                <ul>
+                    <li>Revisar a fila de novos contatos.</li>
+                    <li>Conferir cotações aguardando emissão.</li>
+                    <li>Executar retornos combinados.</li>
+                    <li>Registrar respostas, pendências e próxima ação.</li>
+                    <li>Atualizar pedidos confirmados.</li>
+                    <li>Verificar oportunidades sem responsável ou sem próximo passo.</li>
+                </ul>
+            </div>
+
+            <div class="avoid-break">
+                <h3>8.2. Reunião semanal comercial</h3>
+                <p><strong>Pauta principal:</strong></p>
+                <ul>
+                    <li>Novas oportunidades.</li>
+                    <li>Follow-ups não realizados.</li>
+                    <li>Objeções recorrentes.</li>
+                    <li>Clientes em risco.</li>
+                    <li>Recuperações confirmadas.</li>
+                    <li>Problemas de estoque, entrega e integração.</li>
+                    <li>Ajustes no processo.</li>
+                </ul>
+            </div>
+
+            <div class="avoid-break">
+                <h3>8.3. Revisão mensal</h3>
+                <ul>
+                    <li>Vendas por origem e segmento.</li>
+                    <li>Tempo de resposta e orçamento.</li>
+                    <li>Motivos de perda.</li>
+                    <li>Capacidade de atendimento.</li>
+                    <li>Necessidade de ajustar regras, scripts e distribuição da carteira.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- PÁGINA 8 -->
+    <div class="page">
+        <div class="content-area">
+            <h2>9. MOTIVOS DE PERDA E INDICADORES</h2>
+            
+            <div class="avoid-break">
+                <h3>9.1. Motivos de perda no CRM</h3>
+                <p>A correta classificação da perda retroalimenta os dados comerciais:</p>
+                <div style="display: flex; gap: 20px;">
+                    <ul style="flex: 1;">
+                        <li>Preço.</li>
+                        <li>Prazo ou frete.</li>
+                        <li>Indisponibilidade.</li>
+                        <li>Inadequação técnica.</li>
+                        <li>Pagamento/crédito.</li>
+                        <li>Atendimento.</li>
+                        <li>Erro ou atraso de entrega.</li>
+                    </ul>
+                    <ul style="flex: 1;">
+                        <li>Compra com concorrente confirmada.</li>
+                        <li>Sem necessidade no momento.</li>
+                        <li>Sazonalidade.</li>
+                        <li>Empresa encerrada.</li>
+                        <li>Sem resposta após acompanhamento.</li>
+                        <li>Fora da região/perfil.</li>
+                        <li>Outro, com descrição.</li>
+                    </ul>
+                </div>
+                <p><em>Importante: “Sem resposta” não deve ser registrado como “comprou do concorrente” sem confirmação real.</em></p>
+            </div>
+
+            <div class="avoid-break" style="margin-top: 30px;">
+                <h3>9.2. Dashboards e Relatórios de Gestão</h3>
+                <p>Objetivo final: arquitetar a estrutura de base de dados para que haja a possibilidade de criar via automação, tarefas no CRM de vendas no Funil 2 — Recompra e reativação com atividades para os vendedores e também disparos de e-mail e WhatsApp para clientes.</p>
+                
+                <div class="image-reference">
+                    <strong>Modelo de visualização recomendada (Dashboard):</strong><br>
+                    <a href="https://orssoluan.github.io/casadasembalagens/" target="_blank">
+                        <img src="https://i.imgur.com/yraPtLT.png" alt="Dashboard Casa das Embalagens">
+                    </a>
+                    <br>
+                    <a href="https://orssoluan.github.io/casadasembalagens/" target="_blank" class="action-link">Acessar Dashboard</a>
+                </div>
+
+                <div class="image-reference" style="margin-top: 20px;">
+                    <strong>Modelo base de planilha para alimentação:</strong><br>
+                    <a href="https://docs.google.com/spreadsheets/d/1Mntofua5aFzYiuKdbm44Xk3U2JkNadOpbDSvt7PQsLE/edit?gid=2130979154#gid=2130979154" target="_blank" class="action-link" style="background-color: var(--accent-orange);">Acessar Planilha Base</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Regra 2: Contracapa somente com o logotipo -->
+    <div class="page page-backcover">
+        <img src="https://i.imgur.com/motxyUI.png" alt="Logo Casa das Embalagens" class="logo-large">
+    </div>
+
+</body>
+</html>
