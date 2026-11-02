@@ -1,1 +1,924 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrega Final - Diagnóstico e Planejamento</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons para iconografia visual -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
+    <!-- Configuração de Cores Customizadas no Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            primary: '#2C328E',
+                            secondary: '#FF7B1D',
+                            tertiary: '#FFFFFF',
+                            footer: '#E50914'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Estilos base */
+        body, html { margin: 0; padding: 0; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+
+        /* Animação Canvas Fundo */
+        #hero-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background-color: #2C328E;
+        }
+
+        /* Timeline Horizontal Customizada */
+        .timeline-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            position: relative;
+        }
+        @media(min-width: 768px) {
+            .timeline-container {
+                flex-direction: row;
+                align-items: flex-start;
+                justify-content: space-between;
+            }
+            .timeline-container::before {
+                content: '';
+                position: absolute;
+                top: 24px;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background-color: #e5e7eb;
+                z-index: 1;
+            }
+        }
+        
+        .timeline-step {
+            position: relative;
+            z-index: 2;
+            flex: 1;
+            padding: 0 1rem;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .timeline-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: #2C328E;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            border: 4px solid white;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .timeline-step.highlight .timeline-circle {
+            background-color: #FF7B1D;
+            transform: scale(1.15);
+            box-shadow: 0 0 15px rgba(255, 123, 29, 0.5);
+        }
+        .timeline-step.highlight .step-title {
+            color: #FF7B1D;
+            font-weight: 800;
+        }
+
+        /* -------------------------------------------
+           Estilos Importados: Gráfico de Gantt
+           ------------------------------------------- */
+        :root {
+            --brand-primary: #2C328E;
+            --primary: #FF7B1D;
+            --header-bg: #2C328E;
+            --text-main: #1b1e56;
+            --text-light: #4a4e80;
+            --bg-page: #f4f5f8;
+            --bg-container: #FFFFFF;
+            --border-color: #dbe0ea;
+            --cell-bg: #FFFFFF;
+            --topic-bg: #f9f9fb;
+        }
+
+        .gantt-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--bg-container);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(44, 50, 142, 0.12);
+            border: none;
+        }
+
+        .gantt-chart {
+            display: grid;
+            grid-template-columns: 280px 1fr 1fr 1fr 1fr 1fr 1fr;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+
+        .gantt-header {
+            background-color: var(--header-bg);
+            color: #ffffff;
+            padding: 15px;
+            font-weight: bold;
+            text-align: center;
+            border-right: 1px solid rgba(255, 255, 255, 0.15);
+            border-bottom: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .gantt-header:last-child { border-right: none; }
+        .gantt-header.topic { text-align: left; }
+
+        .gantt-cell {
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            min-height: 60px;
+            background-color: var(--cell-bg);
+        }
+        .gantt-cell:nth-child(7n) { border-right: none; }
+        .topic-cell {
+            font-weight: 600;
+            color: var(--text-main);
+            background-color: var(--topic-bg);
+            font-size: 0.95rem;
+        }
+
+        .gantt-bar {
+            background-color: var(--primary);
+            height: 36px;
+            width: 100%;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(255, 123, 29, 0.3);
+        }
+        .gantt-bar:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 8px rgba(255, 123, 29, 0.5);
+            background-color: #e66a15;
+        }
+
+        /* Modal Gantt */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(44, 50, 142, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            background-color: var(--bg-container);
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            border: none;
+            animation: modalFadeIn 0.3s ease;
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.2s;
+        }
+        .close-btn:hover { color: var(--primary); }
+        .modal-title {
+            color: var(--brand-primary);
+            margin-bottom: 15px;
+            padding-right: 30px;
+            text-align: left;
+            border-bottom: 2px solid var(--primary);
+            display: inline-block;
+            padding-bottom: 5px;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .modal-desc {
+            color: var(--text-light);
+            line-height: 1.6;
+            font-size: 1.05rem;
+            margin-top: 10px;
+        }
+        .modal-meta {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.95rem;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        /* Service Cards Gráfico */
+        .summary-section { margin-top: 50px; padding-top: 40px; border-top: 2px dashed var(--border-color); }
+        .summary-title { text-align: center; color: var(--brand-primary); margin-bottom: 40px; font-size: 1.8rem; font-weight: bold;}
+        .service-cards-container { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        .service-card {
+            background: var(--bg-container);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(44, 50, 142, 0.08);
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .service-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px rgba(44, 50, 142, 0.2);
+            border-color: var(--primary);
+        }
+        .card-header { padding: 30px 20px; text-align: center; position: relative; border-bottom: 2px solid var(--primary); background: var(--topic-bg); }
+        .card-header h3 { margin: 0; font-size: 1.6rem; color: var(--brand-primary); font-weight: bold;}
+        .card-body { padding: 30px; flex-grow: 1; background-color: var(--bg-container); }
+        .service-item {
+            display: flex; align-items: center; padding: 16px 20px; margin-bottom: 15px;
+            background: var(--bg-page); border-radius: 10px; border-left: 5px solid var(--primary);
+            font-weight: 600; color: var(--text-main); transition: background 0.2s ease, transform 0.2s ease;
+            font-size: 0.95rem;
+        }
+        .service-item:last-child { margin-bottom: 0; }
+        .service-item:hover { background: rgba(255, 123, 29, 0.08); transform: translateX(5px); }
+        .service-icon {
+            display: flex; align-items: center; justify-content: center; width: 32px; height: 32px;
+            background: rgba(255, 123, 29, 0.15); color: var(--primary); border-radius: 50%;
+            margin-right: 15px; flex-shrink: 0;
+        }
+
+        @media (max-width: 900px) {
+            .gantt-chart { grid-template-columns: 150px 1fr 1fr 1fr 1fr 1fr 1fr; }
+            .gantt-header { font-size: 0.75rem; padding: 10px 5px; }
+            .topic-cell { font-size: 0.85rem; }
+            .service-cards-container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- CABEÇALHO FIXO -->
+    <header class="fixed top-0 w-full bg-white shadow-md z-[100] h-20 flex items-center px-6 md:px-12 transition-all">
+        <div class="w-full max-w-7xl mx-auto flex justify-between items-center relative">
+            <!-- Espaçador à esquerda para centralizar o logo do cliente perfeitamente -->
+            <div class="w-1/3"></div>
+            
+            <!-- Logo do Cliente (Centro) -->
+            <div class="w-1/3 flex justify-center absolute left-1/2 transform -translate-x-1/2">
+                <img src="https://i.imgur.com/oiekiyj.png" alt="Logo Casa das Embalagens" class="max-h-12 object-contain" onerror="this.src='https://placehold.co/200x60/2C328E/FFFFFF?text=Casa+das+Embalagens'">
+            </div>
+            
+            <!-- Logo da Agência (Direita) -->
+            <div class="w-1/3 flex justify-end">
+                <img src="https://i.imgur.com/jmzaox0.png" alt="Logo V4 Silva Anchieta & Co" class="max-h-10 object-contain brightness-0" onerror="this.src='https://placehold.co/150x50/000000/FFFFFF?text=V4+Company'">
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO SECTION COM ANIMAÇÃO DE REDE -->
+    <section class="relative w-full h-screen min-h-[600px] flex items-center justify-center overflow-hidden pt-20">
+        <!-- Canvas Animado -->
+        <canvas id="hero-canvas"></canvas>
+        
+        <!-- Conteúdo do Hero -->
+        <div class="relative z-10 text-center px-6 max-w-4xl mx-auto flex flex-col items-center">
+            <span class="text-brand-secondary font-bold tracking-widest uppercase text-sm mb-4 bg-white/10 px-4 py-1.5 rounded-full backdrop-blur-sm border border-brand-secondary/30">
+                Entrega Final
+            </span>
+            <h1 class="text-4xl md:text-6xl font-extrabold text-white leading-tight drop-shadow-lg">
+                Diagnóstico e Planejamento <br> <span class="text-brand-secondary">de Marketing e Vendas</span>
+            </h1>
+            <a href="#etapas" class="mt-10 bg-brand-secondary text-white px-8 py-3 rounded-full font-semibold hover:bg-orange-600 transition-all hover:scale-105 shadow-[0_0_15px_rgba(255,123,29,0.4)] flex items-center gap-2">
+                Ver Diagnóstico Completo <i class="ph ph-arrow-down text-xl"></i>
+            </a>
+        </div>
+    </section>
+
+    <!-- SESSÃO: ETAPAS DE ESTUDO (Timeline) -->
+    <section id="etapas" class="py-20 bg-white">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-sm text-brand-secondary font-bold uppercase tracking-wider mb-2">Tudo que você aprendeu no projeto</h2>
+                <h3 class="text-3xl font-extrabold text-brand-primary">Etapas de Estudo</h3>
+            </div>
+
+            <div class="timeline-container">
+                <!-- Semana 1 -->
+                <div class="timeline-step">
+                    <div class="timeline-circle">1</div>
+                    <h4 class="step-title font-semibold text-gray-700 mt-2">Semana 1</h4>
+                    <p class="text-sm text-gray-500 mt-1">Kick-Off e Oferta Principal</p>
+                </div>
+                <!-- Semana 2 -->
+                <div class="timeline-step">
+                    <div class="timeline-circle">2</div>
+                    <h4 class="step-title font-semibold text-gray-700 mt-2">Semana 2</h4>
+                    <p class="text-sm text-gray-500 mt-1">Pesquisa de Mercado & Posicionamento</p>
+                </div>
+                <!-- Semana 3 e 4 -->
+                <div class="timeline-step">
+                    <div class="timeline-circle">3 e 4</div>
+                    <h4 class="step-title font-semibold text-gray-700 mt-2">Semana 3 & 4</h4>
+                    <p class="text-sm text-gray-500 mt-1">Diagnóstico de Marketing & Comercial</p>
+                </div>
+                <!-- Semana 5 (DESTAQUE) -->
+                <div class="timeline-step highlight">
+                    <div class="timeline-circle">
+                        <i class="ph ph-rocket-launch"></i>
+                    </div>
+                    <h4 class="step-title font-semibold mt-2">Semana 5</h4>
+                    <p class="text-sm text-gray-700 font-medium mt-1">Plano de Marketing e Vendas</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SESSÃO: NOSSO NORTE -->
+    <section class="py-20 bg-brand-primary text-white relative overflow-hidden">
+        <!-- Detalhe de fundo -->
+        <div class="absolute -right-20 -top-20 opacity-10">
+            <i class="ph-fill ph-compass text-[300px]"></i>
+        </div>
+        
+        <div class="max-w-5xl mx-auto px-6 text-center relative z-10">
+            <h2 class="text-brand-secondary font-bold text-xl uppercase tracking-widest mb-6">Nosso Norte</h2>
+            <p class="text-2xl font-light italic mb-8">
+                "Qual o principal objetivo que deseja alcançar com a V4 Company?"
+            </p>
+            <div class="bg-white/10 p-8 rounded-2xl backdrop-blur-md border border-white/20 inline-block shadow-2xl">
+                <p class="text-xl md:text-2xl font-semibold leading-relaxed">
+                    Organizar processo de gestão de carteira de clientes ativos e atração de novos clientes para aumentar o faturamento.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SESSÃO: 2ª SEMANA -->
+    <section class="py-20 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <span class="bg-brand-primary text-white px-4 py-1 rounded-full text-sm font-bold shadow-md">2ª Semana</span>
+                <h2 class="text-3xl font-extrabold text-brand-primary mt-6">Pesquisa de Mercado & Posicionamento</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Fato 1 -->
+                <div class="bg-white rounded-2xl p-8 shadow-lg border-t-4 border-brand-secondary hover:-translate-y-2 transition-transform flex flex-col">
+                    <div class="w-14 h-14 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-3xl mb-6">
+                        <i class="ph-fill ph-trend-down"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-brand-primary mb-3">Fato 1: Perda Recorrente de Clientes Ativos</h3>
+                    <p class="text-gray-600 mb-6 text-sm">O mercado está estagnado, então o marketing de retenção vira prioridade. Como a empresa perde 6% da base por mês, estancar essa sangria é mais barato do que captar novos clientes.</p>
+                    
+                    <div class="bg-orange-50 rounded-xl p-4 border border-brand-secondary/20 mt-auto">
+                        <span class="text-brand-secondary font-bold text-xs uppercase tracking-wider mb-2 block flex items-center gap-1">
+                            <i class="ph-bold ph-lightning"></i> Plano de Ação
+                        </span>
+                        <p class="text-sm text-gray-700 font-medium">Implementar gestão de carteira com regras de recompra individualizada, emitindo alertas automáticos para reativar clientes em risco de inativação.</p>
+                    </div>
+                </div>
+
+                <!-- Fato 2 -->
+                <div class="bg-white rounded-2xl p-8 shadow-lg border-t-4 border-brand-secondary hover:-translate-y-2 transition-transform flex flex-col">
+                    <div class="w-14 h-14 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center text-3xl mb-6">
+                        <i class="ph-fill ph-hourglass-high"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-brand-primary mb-3">Fato 2: Lentidão na Emissão de Orçamentos</h3>
+                    <p class="text-gray-600 mb-6 text-sm">Orçamentos de novos clientes demoram mais de uma hora.</p>
+                    
+                    <div class="bg-orange-50 rounded-xl p-4 border border-brand-secondary/20 mt-auto">
+                        <span class="text-brand-secondary font-bold text-xs uppercase tracking-wider mb-2 block flex items-center gap-1">
+                            <i class="ph-bold ph-lightning"></i> Plano de Ação
+                        </span>
+                        <p class="text-sm text-gray-700 font-medium">Reestruturar o envio de orçamentos mais rápidos, acelerando o ciclo de vendas. Já existem sistema de gerenciamento de suprimentos integrado ao ERP do cliente que ele pode fazer cotações, alçadas de aprovação, pedidos de forma automática, programação de compras recorrentes e relatórios de consumo numa única plataforma.</p>
+                    </div>
+                </div>
+
+                <!-- Fato 3 -->
+                <div class="bg-white rounded-2xl p-8 shadow-lg border-t-4 border-brand-secondary hover:-translate-y-2 transition-transform flex flex-col">
+                    <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-3xl mb-6">
+                        <i class="ph-fill ph-tag-chevron"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-brand-primary mb-3">Fato 3: Guerra de Preços</h3>
+                    <p class="text-gray-600 mb-6 text-sm">A venda transacional expõe a empresa à concorrência agressiva por preço.</p>
+                    
+                    <div class="bg-orange-50 rounded-xl p-4 border border-brand-secondary/20 mt-auto">
+                        <span class="text-brand-secondary font-bold text-xs uppercase tracking-wider mb-2 block flex items-center gap-1">
+                            <i class="ph-bold ph-lightning"></i> Plano de Ação
+                        </span>
+                        <p class="text-sm text-gray-700 font-medium">Estruturar contratos de comodato de dispensers para gerar fidelização por lock-in e lançar soluções logísticas dedicadas ao Distrito Industrial de Botucatu.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-12 text-center">
+                <a href="https://orssoluan.github.io/casadasembalagens/pesquisa.html" target="_blank" class="inline-flex items-center gap-2 bg-brand-primary text-white px-8 py-3 rounded-full font-bold hover:bg-blue-900 transition-colors shadow-lg">
+                    Clique para acessar o material <i class="ph-bold ph-arrow-square-out"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- SESSÃO: 3ª SEMANA -->
+    <section class="py-20 bg-white">
+        <div class="max-w-5xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <span class="bg-brand-primary text-white px-4 py-1 rounded-full text-sm font-bold shadow-md">3ª Semana</span>
+                <h2 class="text-3xl font-extrabold text-brand-primary mt-6">Diagnóstico Marketing</h2>
+                <p class="text-gray-500 mt-4 max-w-2xl mx-auto">Conjunto de ações direcionadas para impulsionar a captação e otimizar os processos comerciais.</p>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Ação 1 -->
+                <div class="flex items-start gap-4 p-6 bg-gray-50 rounded-2xl border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="w-12 h-12 flex-shrink-0 bg-brand-secondary text-white rounded-xl flex items-center justify-center text-2xl shadow-sm">
+                        <i class="ph-bold ph-browsers"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-bold text-brand-primary mb-1">Landing Page e Captura</h4>
+                        <p class="text-gray-600"><strong>Plano de Ação:</strong> Desenvolver Landing Page integrada ao Typeform e WhatsApp, eliminando formulários longos para acelerar orçamentos.</p>
+                    </div>
+                </div>
+
+                <!-- Ação 2 -->
+                <div class="flex items-start gap-4 p-6 bg-gray-50 rounded-2xl border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="w-12 h-12 flex-shrink-0 bg-brand-secondary text-white rounded-xl flex items-center justify-center text-2xl shadow-sm">
+                        <i class="ph-bold ph-google-logo"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-bold text-brand-primary mb-1">Google Ads</h4>
+                        <p class="text-gray-600"><strong>Plano de Ação:</strong> Veicular anúncios no Google Ads usando termos listados como "fornecedor de produtos de limpeza" com 5.400 buscas mensais, direcionando para a nova Landing Page.</p>
+                    </div>
+                </div>
+
+                <!-- Ação 3 -->
+                <div class="flex items-start gap-4 p-6 bg-gray-50 rounded-2xl border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="w-12 h-12 flex-shrink-0 bg-brand-secondary text-white rounded-xl flex items-center justify-center text-2xl shadow-sm">
+                        <i class="ph-bold ph-meta-logo"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-bold text-brand-primary mb-1">Meta Ads</h4>
+                        <p class="text-gray-600"><strong>Plano de Ação:</strong> Veicular anúncios no Meta Ads direcionando para a nova Landing Page.</p>
+                    </div>
+                </div>
+
+                <!-- Ação 4 -->
+                <div class="flex items-start gap-4 p-6 bg-gray-50 rounded-2xl border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="w-12 h-12 flex-shrink-0 bg-brand-secondary text-white rounded-xl flex items-center justify-center text-2xl shadow-sm">
+                        <i class="ph-bold ph-users-three"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-bold text-brand-primary mb-1">CRM e Treinamento</h4>
+                        <p class="text-gray-600"><strong>Plano de Ação:</strong> Migrar a equipe para um CRM integrado ao Whatsapp, capacitando vendedores como Cléber para enviar orçamentos e fazer Follow Up por ali.</p>
+                    </div>
+                </div>
+
+                <!-- Ação 5 -->
+                <div class="flex items-start gap-4 p-6 bg-gray-50 rounded-2xl border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="w-12 h-12 flex-shrink-0 bg-brand-secondary text-white rounded-xl flex items-center justify-center text-2xl shadow-sm">
+                        <i class="ph-bold ph-database"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-bold text-brand-primary mb-1">Integração ERP e Automação RFM</h4>
+                        <p class="text-gray-600"><strong>Plano de Ação:</strong> Integrar dados de histórico de compra do ERP WSac para uma base de dados planilha e integrar a dashboar e ao CRM aplicando matriz RFM com gatilhos automáticos de recompra para combater o churn mensal de 6%.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-12 text-center">
+                <a href="https://orssoluan.github.io/casadasembalagens/marketing.html" target="_blank" class="inline-flex items-center gap-2 bg-brand-primary text-white px-8 py-3 rounded-full font-bold hover:bg-blue-900 transition-colors shadow-lg">
+                    Clique para acessar o material <i class="ph-bold ph-arrow-square-out"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- SESSÃO: ARTEFATOS PARA EXECUÇÃO -->
+    <section class="py-20 bg-brand-primary text-white">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-extrabold mb-4">Artefatos para Execução</h2>
+                <p class="text-brand-tertiary/80 max-w-2xl mx-auto">Os materiais desenvolvidos e preparados para colocar o planejamento em prática com excelência.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                <!-- Artefato 1 -->
+                <div class="bg-white/10 rounded-2xl p-5 flex flex-col items-center text-center border border-white/20 backdrop-blur-sm hover:bg-white/20 transition-all">
+                    <h3 class="font-bold text-lg mb-4 text-brand-secondary h-14 flex items-center justify-center">Manual de Identidade Visual</h3>
+                    <img src="https://i.imgur.com/eTWsL5F.png" alt="Manual" class="w-full h-32 object-cover rounded-xl mb-6 shadow-inner" onerror="this.src='https://placehold.co/300x150/111827/FFFFFF?text=Manual'">
+                    <a href="https://drive.google.com/file/d/1H6KWlTZx8rKiMaurEHHEXzhGrRnoApMu/view" target="_blank" class="mt-auto w-full bg-white text-brand-primary font-bold py-2 rounded-lg hover:bg-gray-100 transition-colors">
+                        Baixar material
+                    </a>
+                </div>
+
+                <!-- Artefato 2 -->
+                <div class="bg-white/10 rounded-2xl p-5 flex flex-col items-center text-center border border-white/20 backdrop-blur-sm hover:bg-white/20 transition-all">
+                    <h3 class="font-bold text-lg mb-4 text-brand-secondary h-14 flex items-center justify-center">Criativos para anúncio</h3>
+                    <img src="https://i.imgur.com/onRfBCV.png" alt="Criativos" class="w-full h-32 object-cover rounded-xl mb-6 shadow-inner" onerror="this.src='https://placehold.co/300x150/111827/FFFFFF?text=Criativos'">
+                    <a href="https://drive.google.com/drive/folders/1u_YrlmOJK-Q_Fb_P3kUuNGS3OoP1YCOF" target="_blank" class="mt-auto w-full bg-white text-brand-primary font-bold py-2 rounded-lg hover:bg-gray-100 transition-colors">
+                        Baixar material
+                    </a>
+                </div>
+
+                <!-- Artefato 3 -->
+                <div class="bg-white/10 rounded-2xl p-5 flex flex-col items-center text-center border border-white/20 backdrop-blur-sm hover:bg-white/20 transition-all">
+                    <h3 class="font-bold text-lg mb-4 text-brand-secondary h-14 flex items-center justify-center">Landing Page</h3>
+                    <img src="https://i.imgur.com/I79eWK6.png" alt="Landing Page" class="w-full h-32 object-cover rounded-xl mb-6 shadow-inner" onerror="this.src='https://placehold.co/300x150/111827/FFFFFF?text=Landing+Page'">
+                    <a href="https://vocal-biscochitos-881035.netlify.app/" target="_blank" class="mt-auto w-full bg-white text-brand-primary font-bold py-2 rounded-lg hover:bg-gray-100 transition-colors">
+                        Baixar material
+                    </a>
+                </div>
+
+                <!-- Artefato 4 -->
+                <div class="bg-white/10 rounded-2xl p-5 flex flex-col items-center text-center border border-white/20 backdrop-blur-sm hover:bg-white/20 transition-all">
+                    <h3 class="font-bold text-lg mb-4 text-brand-secondary h-14 flex items-center justify-center">Roteiros</h3>
+                    <img src="https://i.imgur.com/7yyz09A.png" alt="Roteiros" class="w-full h-32 object-cover rounded-xl mb-6 shadow-inner" onerror="this.src='https://placehold.co/300x150/111827/FFFFFF?text=Roteiros'">
+                    <!-- Sem botão solicitado para este -->
+                    <div class="mt-auto w-full py-2"></div>
+                </div>
+
+                <!-- Artefato 5 -->
+                <div class="bg-white/10 rounded-2xl p-5 flex flex-col items-center text-center border border-white/20 backdrop-blur-sm hover:bg-white/20 transition-all">
+                    <h3 class="font-bold text-lg mb-4 text-brand-secondary h-14 flex items-center justify-center">Playbook Comercial</h3>
+                    <img src="https://i.imgur.com/pB4ycJI.png" alt="Playbook Comercial" class="w-full h-32 object-cover rounded-xl mb-6 shadow-inner" onerror="this.src='https://placehold.co/300x150/111827/FFFFFF?text=Playbook'">
+                    <a href="https://orssoluan.github.io/casadasembalagens/playbook.html" target="_blank" class="mt-auto w-full bg-white text-brand-primary font-bold py-2 rounded-lg hover:bg-gray-100 transition-colors">
+                        Baixar material
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SESSÃO: FORECAST -->
+    <section class="py-20 bg-gray-50">
+        <div class="max-w-5xl mx-auto px-6 text-center">
+            <h2 class="text-3xl font-extrabold text-brand-primary mb-10">Forecast</h2>
+            
+            <div class="bg-white p-4 rounded-2xl shadow-xl inline-block">
+                <img src="https://i.imgur.com/hSWMVk9.png" alt="Gráfico de Forecast" class="w-full max-w-3xl rounded-lg" onerror="this.src='https://placehold.co/800x400/E5E7EB/4B5563?text=Forecast+Visual'">
+            </div>
+
+            <div class="mt-10 bg-yellow-50 border-l-4 border-yellow-400 p-6 rounded-r-xl max-w-3xl mx-auto text-left flex items-start gap-4">
+                <i class="ph-fill ph-warning-circle text-yellow-500 text-3xl mt-1"></i>
+                <div>
+                    <h4 class="font-bold text-yellow-800 mb-1">OBSERVAÇÃO IMPORTANTE</h4>
+                    <p class="text-gray-700 text-sm">
+                        Não se aplica nesse momento, pois, não temos histórico de campanhas da Casa das Embalagens. Quando finalizar 3 meses de campanhas de tráfego pago ativas, sugiro fazer o Forecast utilizando CPL, CAC, TICKET MÉDIO, ROAS.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SESSÃO: CALENDÁRIO ESTRATÉGICO (GANTT) -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-extrabold text-brand-primary mb-4">Calendário Estratégico</h2>
+                <p class="text-gray-500">Planejamento de execução para os próximos 6 meses.</p>
+            </div>
+
+            <!-- INÍCIO DO CÓDIGO HTML GANTT FORNECIDO -->
+            <div class="gantt-wrapper">
+                <div class="gantt-chart">
+                    <div class="gantt-header topic">Ação / Tópico</div>
+                    <div class="gantt-header">Novembro<br><small>2026</small></div>
+                    <div class="gantt-header">Dezembro<br><small>2026</small></div>
+                    <div class="gantt-header">Janeiro<br><small>2027</small></div>
+                    <div class="gantt-header">Fevereiro<br><small>2027</small></div>
+                    <div class="gantt-header">Março<br><small>2027</small></div>
+                    <div class="gantt-header">Abril<br><small>2027</small></div>
+
+                    <!-- Mês 1: Novembro 2026 -->
+                    <div class="gantt-cell topic-cell">Implementar CRM de Vendas</div>
+                    <div class="gantt-cell"><div class="gantt-bar" onclick="openModal('Implementar CRM de Vendas', 'Recomendo implementar um CRM de Vendas em novembro. A execução será feita através da implementação dos funis de novos clientes e recuperação, campos obrigatórios, responsáveis, tarefas e motivos de perda. A entrega será um CRM testado conforme playbook comercial.', 'Novembro 2026')"></div></div>
+                    <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+
+                    <div class="gantt-cell topic-cell">Fazer integração de Dados & automações</div>
+                    <div class="gantt-cell"><div class="gantt-bar" onclick="openModal('Fazer integração de Dados & automações', 'Recomendo utilizar os recursos de integração em novembro para conectar a base histórica de compras de clientes, o ERP e o CRM. A execução será feita através de API ou importação programada, padronização dos identificadores e conciliação de pedidos. A execução será feita através de alertas anteriores aos limites individuais de inatividade, tarefas com prazos de atendimento e mensagens por categoria comprada. Incluir relacionamento com ativos, recuperação de recentes e reativação mensal de antigos. Testar exceções, permissões de contato e interrupção após compra.', 'Novembro 2026')"></div></div>
+                    <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+
+                    <div class="gantt-cell topic-cell">Implementar Dashboard</div>
+                    <div class="gantt-cell"><div class="gantt-bar" onclick="openModal('Implementar Dashboard', 'Recomendo integrar marketing e vendas ao dashboard. A execução será feita através da conexão entre mídia, CRM e ERP, conciliando origens, clientes e datas. Consolidar aquisição, tempo de orçamento, conversão comercial, recompra e recuperação. A entrega será um painel validado por amostragem, com frequência de atualização, responsáveis e rotina semanal de análise.', 'Novembro 2026')"></div></div>
+                    <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+
+                    <!-- Mês 2: Dezembro 2026 -->
+                    <div class="gantt-cell topic-cell">Implementar Playbook Comercial</div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"><div class="gantt-bar" onclick="openModal('Implementar Playbook Comercial', 'Recomendo capacitar Cléber e Guilherme em novembro para operar Inside Sales com processos comerciais padronizados', 'Dezembro 2026')"></div></div>
+                    <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+
+                    <div class="gantt-cell topic-cell">Fazer Rastreamento GTM</div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"><div class="gantt-bar" onclick="openModal('Fazer Rastreamento GTM', 'Recomendo configurar o rastreamento pelo GTM. A execução será feita através de revisão das tags, eventos de formulário, cliques no WhatsApp, parâmetros de campanha e consentimentos aplicáveis. Preparar a identificação da origem no CRM e diferenciar clique de conversa recebida.', 'Dezembro 2026')"></div></div>
+                    <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+                    
+                    <div class="gantt-cell topic-cell">Publicação Landing Page</div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"><div class="gantt-bar" onclick="openModal('Publicação Landing Page', 'Recomendo publicar a Landing Page que a V4 fez.', 'Dezembro 2026')"></div></div>
+                    <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+                    
+                    <div class="gantt-cell topic-cell">Desenvolver criativos de anúncio</div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"><div class="gantt-bar" onclick="openModal('Desenvolver criativos de anúncio', 'A entrega será um conjunto aprovado de criativos de anuncio feito por design batendo nos ganchos principais utilizandos na landing page', 'Dezembro 2026')"></div></div>
+                    <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+
+                    <div class="gantt-cell topic-cell">Ativação das campanhas de tráfego</div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"><div class="gantt-bar" onclick="openModal('Ativação das campanhas de tráfego', 'Ativação das campanhas de tráfego estruturadas e aprovadas para captação de novos clientes e geração de demanda.', 'Dezembro 2026')"></div></div>
+                    <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+
+                    <!-- Mês 3: Janeiro 2027 -->
+                    <div class="gantt-cell topic-cell">Expansão da Base</div>
+                    <div class="gantt-cell"></div><div class="gantt-cell"></div>
+                    <div class="gantt-cell"><div class="gantt-bar" onclick="openModal('Expansão da Base', 'Recomendo executar cross-sell utilizando CRM, histórico de pedidos e equipe comercial, preservando o acompanhamento dos clientes em risco. A execução será feita através da identificação de categorias complementares por segmento e ofertas de kits de higiene, limpeza e descartáveis. Testar abordagens em grupos delimitados antes de ampliar contatos.', 'Janeiro 2027')"></div></div>
+                    <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+
+                    <!-- Mês 4: Fevereiro 2027 -->
+                    <div class="gantt-cell topic-cell">Divulgar o Lock-in</div>
+                    <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+                    <div class="gantt-cell"><div class="gantt-bar" onclick="openModal('Divulgar o Lock-in', 'Estruturar contratos de comodato de dispensers para gerar fidelização por lock-in e lançar soluções logísticas dedicadas ao Distrito Industrial de Botucatu.', 'Fevereiro 2027')"></div></div>
+                    <div class="gantt-cell"></div><div class="gantt-cell"></div>
+
+                    <!-- Mês 5: Março 2027 -->
+                    <div class="gantt-cell topic-cell">Melhoria no ERP junto a WSac</div>
+                    <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+                    <div class="gantt-cell"><div class="gantt-bar" onclick="openModal('Melhoria no ERP junto a WSac', 'Ver junto com o desenvolvedor do Wsac se conseguem um módulo de gerenciamento de suprimentos integrado ao ERP do cliente que ele pode fazer cotações, alçadas de aprovação, pedidos de forma automática, programação de compras recorrentes e relatórios de consumo numa única plataforma.', 'Março 2027')"></div></div>
+                    <div class="gantt-cell"></div>
+
+                    <!-- Mês 6: Abril 2027 -->
+                    <div class="gantt-cell topic-cell">Replanejamento Orçamentário</div>
+                    <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+                    <div class="gantt-cell"><div class="gantt-bar" onclick="openModal('Replanejamento Orçamentário', 'Recomendo realizar o replanejamento orçamentário em abril com liderança, comercial e atendimento V4, utilizando as evidências acumuladas. A execução será feita através da revisão de aquisição, retenção, cross-sell, custos operacionais e capacidade de atendimento. Definir quais iniciativas manter, corrigir ou interromper, sem aumento automático de mídia. A entrega será um orçamento aprovado para o próximo ciclo, com prioridades, responsáveis e eventuais contratações justificadas por lacunas comprovadas.', 'Abril 2027')"></div></div>
+                </div>
+
+                <div class="summary-section">
+                    <h2 class="summary-title">Resumo de Serviços Recomendados</h2>
+                    <div class="service-cards-container">
+                        <div class="service-card">
+                            <div class="card-header">
+                                <h3>Categoria TER</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="service-item">
+                                    <div class="service-icon">
+                                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                                    </div>
+                                    Implementação CRM Vendas
+                                </div>
+                                <div class="service-item">
+                                    <div class="service-icon">
+                                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+                                    </div>
+                                    Implementação e Gestão de Dados
+                                </div>
+                                <div class="service-item">
+                                    <div class="service-icon">
+                                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                                    </div>
+                                    Implementação de Chatbot
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="service-card">
+                            <div class="card-header">
+                                <h3>Categoria EXECUTAR</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="service-item">
+                                    <div class="service-icon">
+                                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                                    </div>
+                                    Combo Performance - Inside Sales
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal do Gráfico Gantt -->
+            <div class="modal-overlay" id="actionModal" onclick="closeModal(event)">
+                <div class="modal-content" onclick="event.stopPropagation()">
+                    <span class="close-btn" onclick="forceCloseModal()">&times;</span>
+                    <h2 class="modal-title" id="modalTitle">Título da Ação</h2>
+                    <div class="modal-desc" id="modalDesc">Descrição da ação...</div>
+                    <div class="modal-meta" id="modalMeta">Período: </div>
+                </div>
+            </div>
+            <!-- FIM DO CÓDIGO HTML GANTT FORNECIDO -->
+
+        </div>
+    </section>
+
+    <!-- SESSÃO: MATERIAIS EXTRAS & OBRIGADO -->
+    <section class="py-20 bg-brand-secondary text-white text-center">
+        <div class="max-w-4xl mx-auto px-6">
+            <i class="ph ph-folder-open text-6xl mb-6 drop-shadow-md"></i>
+            <h2 class="text-3xl font-bold mb-4">Acesse aqui as gravações, apresentações e materiais gráficos desta consultoria:</h2>
+            <a href="https://drive.google.com/drive/folders/1y5n8ColXExB35D5WAUqYoGXofGJjQMps" target="_blank" class="inline-flex items-center gap-2 bg-white text-brand-secondary px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition-colors shadow-lg mt-6">
+                Clique para acessar <i class="ph-bold ph-arrow-right"></i>
+            </a>
+        </div>
+    </section>
+
+    <!-- OBRIGADO -->
+    <section class="py-24 bg-brand-primary text-white text-center flex items-center justify-center">
+        <div class="max-w-4xl mx-auto px-6">
+            <h2 class="text-4xl md:text-5xl font-extrabold uppercase tracking-widest leading-tight">
+                Obrigado por<br>
+                <span class="text-brand-secondary">abrir as portas para a</span><br>
+                V4 Company
+            </h2>
+        </div>
+    </section>
+
+    <!-- RODAPÉ FINAL -->
+    <footer class="bg-brand-footer text-white py-6">
+        <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="text-sm font-medium">
+                &copy; 2026 Todos os direitos reservados.
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="text-sm font-bold uppercase tracking-wider">Produzido por:</span>
+                <img src="https://i.imgur.com/SU08Zb0.png" alt="Logo V4 Footer" class="h-8 object-contain" onerror="this.src='https://placehold.co/100x40/E50914/FFFFFF?text=V4+Company'">
+            </div>
+        </div>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script>
+        /* =========================================
+           SCRIPT: ANIMAÇÃO DE REDE (CANVAS)
+           ========================================= */
+        const coresDasBolinhas = ['#FF7B1D']; 
+        const corDasLinhas = '#FF7B1D'; 
+        
+        const canvas = document.getElementById('hero-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+        
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            // Para garantir que cubra a section hero corretamente
+            height = canvas.height = canvas.parentElement.offsetHeight || window.innerHeight;
+        }
+        
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 1.5;
+                this.vy = (Math.random() - 0.5) * 1.5;
+                this.size = Math.random() * 3 + 1;
+                this.color = coresDasBolinhas[Math.floor(Math.random() * coresDasBolinhas.length)];
+                this.alpha = Math.random() * 0.5 + 0.1;
+            }
+            
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+            }
+            
+            draw() {
+                ctx.beginPath();
+                // Corrigido de Math.PI \n 2 para Math.PI * 2
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.alpha;
+                ctx.fill();
+            }
+        }
+        
+        function init() {
+            particles = [];
+            const particleCount = width > 768 ? 150 : 60; 
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+        
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            
+            particles.forEach((p, index) => {
+                p.update();
+                p.draw();
+                
+                for (let j = index + 1; j < particles.length; j++) {
+                    const p2 = particles[j];
+                    const dx = p.x - p2.x;
+                    const dy = p.y - p2.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < 150) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = corDasLinhas;
+                        // Corrigido para garantir a matemática correta da transparência (1 - (dist / max))
+                        ctx.globalAlpha = 1 - (distance / 150);
+                        ctx.lineWidth = 0.5;
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
+                }
+            });
+            
+            requestAnimationFrame(animate);
+        }
+        
+        window.addEventListener('resize', () => {
+            resize();
+            init();
+        });
+        
+        // Iniciar animação no load
+        window.onload = function() {
+            resize();
+            init();
+            animate();
+        };
+
+        /* =========================================
+           SCRIPT: MODAL GANTT CHART
+           ========================================= */
+        const modal = document.getElementById('actionModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDesc = document.getElementById('modalDesc');
+        const modalMeta = document.getElementById('modalMeta');
+
+        function openModal(title, description, period) {
+            modalTitle.textContent = title;
+            modalDesc.textContent = description;
+            modalMeta.textContent = 'Período estimado: ' + period;
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; 
+        }
+
+        function closeModal(event) {
+            if (event.target === modal) {
+                forceCloseModal();
+            }
+        }
+
+        function forceCloseModal() {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto'; 
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === "Escape") {
+                forceCloseModal();
+            }
+        });
+    </script>
+</body>
+</html>
